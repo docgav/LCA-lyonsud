@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Apprentissage de la Lecture Critique : La Randomisation</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Ajout de Chart.js et du plugin pour les labels -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+    <style>
+
+        body {
+
+            font-family: 'Inter', sans-serif;
+
+            background-color: #f8fafc; /* slate-50 */
+
+        }
+
+        h1, h2, h3 {
+
+            font-family: 'Roboto Slab', serif;
+
+        }
+
+        /* Animation pour l'apparition des sections */
+
+        .hidden-section {
+
+            opacity: 0;
+
+            transform: translateY(20px);
+
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+
+        }
+
+        .visible-section {
+
+            opacity: 1;
+
+            transform: translateY(0);
+
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+ 
+
+    <header class="bg-white shadow-md">
+
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+
+            <h1 class="text-4xl font-bold text-slate-900">Apprendre la Lecture Critique d'Article</h1>
+
+            <p class="mt-2 text-xl text-slate-600">Module Interactif sur la Randomisation</p>
+
+        </div>
+
+    </header>
+
+ 
+
+    <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12">
+
+        <!-- =================================================================================== -->
+
+        <!-- PARTIE 1 : RANDOMISATION SIMPLE -->
+
+        <!-- =================================================================================== -->
+
+        <section id="simple-randomization" class="bg-white p-6 rounded-lg shadow-lg">
+
+            <h2 class="text-2xl font-bold text-cyan-700 border-b-2 border-cyan-100 pb-2">1. Randomisation Simple</h2>
+
+            <p class="mt-4 text-slate-600">Chaque participant a une chance égale (50%) d'être assigné au groupe "Traité" ou "Placebo". Par pur hasard, cette méthode peut conduire à des déséquilibres importants dans la taille des groupes.</p>
+
+            <div class="mt-6 p-4 bg-slate-100 rounded-md flex items-center gap-4 flex-wrap">
+
+                <label for="simple-n" class="font-bold">Nombre de participants :</label>
+
+                <input type="number" id="simple-n" value="30" min="10" max="500" class="w-24 p-2 border border-slate-300 rounded-md">
+
+                <button onclick="simulateSimpleRandomization()" class="px-4 py-2 bg-cyan-600 text-white font-semibold rounded-md hover:bg-cyan-700 transition">Lancer la simulation</button>
+
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+
+                <div id="simple-results-summary" class="p-4 bg-cyan-50 border border-cyan-200 rounded-md"></div>
+
+                <div class="bg-slate-50 p-4 rounded-lg">
+
+                    <h3 class="text-lg font-bold text-center mb-2">Visualisation des Effectifs</h3>
+
+                    <canvas id="simpleChart"></canvas>
+
+                </div>
+
+            </div>
+
+            <div class="mt-8 text-right">
+
+                <button onclick="showNext('block-randomization')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Passer à l'exercice suivant →</button>
+
+            </div>
+
+        </section>
+
+ 
+
+        <!-- =================================================================================== -->
+
+        <!-- PARTIE 2 : RANDOMISATION PAR BLOCS (initialement cachée) -->
+
+        <!-- =================================================================================== -->
+
+        <section id="block-randomization" class="bg-white p-6 rounded-lg shadow-lg hidden hidden-section">
+
+            <h2 class="text-2xl font-bold text-green-700 border-b-2 border-green-100 pb-2">2. Randomisation par Blocs</h2>
+
+            <p class="mt-4 text-slate-600">La randomisation par blocs garantit un équilibre régulier de la taille des groupes en randomisant par "blocs" de taille fixe (ici, 4), où chaque bloc contient 2 "Traité" et 2 "Placebo".</p>
+
+            <div class="mt-6 p-4 bg-slate-100 rounded-md flex items-center gap-4 flex-wrap">
+
+                <label for="block-n" class="font-bold">Nb. de participants (multiple de 4) :</label>
+
+                <input type="number" id="block-n" value="32" min="8" max="500" step="4" class="w-24 p-2 border border-slate-300 rounded-md">
+
+                <button onclick="simulateBlockRandomization()" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 transition">Lancer la simulation</button>
+
+            </div>
+
+            <div class="mt-6">
+
+                 <div id="block-list-summary" class="mb-4 p-4 bg-slate-100 rounded-md text-sm"></div>
+
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+
+                    <div id="block-results-summary" class="p-4 bg-green-50 border border-green-200 rounded-md"></div>
+
+                    <div class="bg-slate-50 p-4 rounded-lg">
+
+                        <h3 class="text-lg font-bold text-center mb-2">Visualisation des Effectifs</h3>
+
+                        <canvas id="blockChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="mt-8 text-right">
+
+                <button onclick="showNext('population-randomization')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Passer à l'exercice suivant →</button>
+
+            </div>
+
+        </section>
+
+ 
+
+        <!-- =================================================================================== -->
+
+        <!-- PARTIE 3 : RANDOMISATION & FACTEURS PRONOSTIQUES (initialement cachée) -->
+
+        <!-- =================================================================================== -->
+
+        <section id="population-randomization" class="bg-white p-6 rounded-lg shadow-lg hidden hidden-section">
+
+            <h2 class="text-2xl font-bold text-amber-700 border-b-2 border-amber-100 pb-2">3. Blocs & Facteurs Pronostiques</h2>
+
+            <p class="mt-4 text-slate-600">Même avec des effectifs équilibrés, un déséquilibre peut survenir sur des facteurs importants (ex: le sexe). Une randomisation par blocs simple ne garantit PAS que les proportions H/F seront égales dans les groupes finaux.</p>
+
+            <div class="mt-6 p-4 bg-slate-100 rounded-md flex items-center gap-4 flex-wrap">
+
+                <label for="population-n" class="font-bold">Taille de l'échantillon (multiple de 4) :</label>
+
+                <input type="number" id="population-n" value="40" min="12" max="500" step="4" class="w-24 p-2 border border-slate-300 rounded-md">
+
+                <button onclick="simulatePopulationAndBlockRandomization()" class="px-4 py-2 bg-amber-600 text-white font-semibold rounded-md hover:bg-amber-700 transition">Lancer la simulation</button>
+
+            </div>
+
+            <div class="mt-6 space-y-4">
+
+                <div id="population-sample-summary" class="p-4 bg-amber-50 border border-amber-200 rounded-md"></div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+
+                    <div id="population-results-summary" class="p-4 bg-amber-50 border border-amber-200 rounded-md"></div>
+
+                    <div class="bg-slate-50 p-4 rounded-lg">
+
+                        <h3 class="text-lg font-bold text-center mb-2">Répartition H/F dans les Groupes</h3>
+
+                        <canvas id="populationResultChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="mt-8 text-right">
+
+                <button onclick="showNext('stratified-randomization')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Passer à l'exercice suivant →</button>
+
+            </div>
+
+        </section>
+
+ 
+
+        <!-- =================================================================================== -->
+
+        <!-- PARTIE 4 : RANDOMISATION STRATIFIÉE (initialement cachée) -->
+
+        <!-- =================================================================================== -->
+
+        <section id="stratified-randomization" class="bg-white p-6 rounded-lg shadow-lg hidden hidden-section">
+
+            <h2 class="text-2xl font-bold text-pink-700 border-b-2 border-pink-100 pb-2">4. Randomisation Stratifiée</h2>
+
+            <p class="mt-4 text-slate-600">Pour garantir l'équilibre d'un facteur, on applique une randomisation par blocs <b>séparément dans chaque strate</b> (hommes et femmes). Cela garantit un équilibre quasi-parfait du facteur entre les groupes.</p>
+
+             <div class="mt-6 p-4 bg-slate-100 rounded-md flex items-center gap-4 flex-wrap">
+
+                <label for="stratified-n" class="font-bold">Taille de l'échantillon :</label>
+
+                <input type="number" id="stratified-n" value="40" min="12" max="500" class="w-24 p-2 border border-slate-300 rounded-md">
+
+                <button onclick="simulateStratifiedRandomization()" class="px-4 py-2 bg-pink-600 text-white font-semibold rounded-md hover:bg-pink-700 transition">Lancer la simulation</button>
+
+            </div>
+
+            <div class="mt-6 space-y-4">
+
+                <div id="stratified-sample-summary" class="p-4 bg-pink-50 border border-pink-200 rounded-md"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+                    <div id="stratified-men-summary" class="p-2 bg-slate-100 rounded-md"></div>
+
+                    <div id="stratified-women-summary" class="p-2 bg-slate-100 rounded-md"></div>
+
+                </div>
+
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+
+                    <div id="stratified-results-summary" class="p-4 bg-pink-50 border border-pink-200 rounded-md"></div>
+
+                    <div class="bg-slate-50 p-4 rounded-lg">
+
+                        <h3 class="text-lg font-bold text-center mb-2">Répartition H/F dans les Groupes</h3>
+
+                        <canvas id="stratifiedResultChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+ 
+
+    <footer class="text-center py-6 text-slate-500 text-sm">
+
+        <p>Créé pour l'apprentissage de la lecture critique.</p>
+
+    </footer>
+
+ 
+
+<script>
+
+// Enregistrer le plugin de datalabels globalement
+
+Chart.register(ChartDataLabels);
+
+ 
+
+// Couleurs
+
+const TRAITE_COLOR = 'rgba(34, 211, 238, 0.8)';   // Cyan
+
+const PLACEBO_COLOR = 'rgba(251, 146, 60, 0.8)';  // Orange
+
+const MAN_COLOR = 'rgba(96, 165, 250, 0.8)';      // Blue
+
+const WOMAN_COLOR = 'rgba(236, 72, 153, 0.8)';   // Pink
+
+ 
+
+// ===================================================================================
+
+// GESTIONNAIRE DE GRAPHIQUES ET AFFICHAGE
+
+// ===================================================================================
+
+const chartInstances = {};
+
+ 
+
+function createOrUpdateChart(canvasId, chartData, chartOptions, type = 'bar') {
+
+    const ctx = document.getElementById(canvasId).getContext('2d');
+
+    if (chartInstances[canvasId]) {
+
+        chartInstances[canvasId].data = chartData;
+
+        chartInstances[canvasId].options = chartOptions;
+
+        chartInstances[canvasId].update();
+
+    } else {
+
+        chartInstances[canvasId] = new Chart(ctx, { type, data: chartData, options: chartOptions });
+
+    }
+
+}
+
+ 
+
+function showNext(sectionId) {
+
+    const section = document.getElementById(sectionId);
+
+    if (section) {
+
+        section.classList.remove('hidden');
+
+        // Déclenche la simulation la première fois que la section est montrée
+
+        if (!section.hasAttribute('data-simulated')) {
+
+            if (sectionId === 'block-randomization') simulateBlockRandomization();
+
+            if (sectionId === 'population-randomization') simulatePopulationAndBlockRandomization();
+
+            if (sectionId === 'stratified-randomization') simulateStratifiedRandomization();
+
+            section.setAttribute('data-simulated', 'true');
+
+        }
+
+        // Timeout pour permettre à la classe d'être appliquée avant de scroller
+
+        setTimeout(() => {
+
+            section.classList.add('visible-section');
+
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        }, 50);
+
+    }
+
+}
+
+ 
+
+ 
+
+// ===================================================================================
+
+// PARTIE 1 : SIMULATION DE LA RANDOMISATION SIMPLE
+
+// ===================================================================================
+
+function simulateSimpleRandomization() {
+
+    const n = parseInt(document.getElementById('simple-n').value);
+
+    const groupA = [];
+
+    const groupB = [];
+
+    for (let i = 1; i <= n; i++) {
+
+        if (Math.random() < 0.5) groupA.push(i); else groupB.push(i);
+
+    }
+
+    const imbalance = Math.abs(groupA.length - groupB.length);
+
+    const imbalanceColor = imbalance === 0 ? 'text-green-700' : 'text-red-700';
+
+    document.getElementById('simple-results-summary').innerHTML = `Sur <b>${n}</b> participants :<br>
+
+        - Traité : <b>${groupA.length}</b> | Placebo : <b>${groupB.length}</b><br>
+
+        - <b class="${imbalanceColor}">Déséquilibre : ${imbalance} participant(s).</b>`;
+
+ 
+
+    createOrUpdateChart('simpleChart', {
+
+        labels: ['Traité', 'Placebo'],
+
+        datasets: [{
+
+            data: [groupA.length, groupB.length],
+
+            backgroundColor: [TRAITE_COLOR, PLACEBO_COLOR],
+
+        }]
+
+    }, {
+
+        plugins: {
+
+            legend: { display: false },
+
+            datalabels: {
+
+                anchor: 'center',
+
+                align: 'center',
+
+                color: '#1e293b', // slate-800
+
+                font: { weight: 'bold' },
+
+                formatter: (value) => `${value}\n(${(value/n*100).toFixed(1)}%)`
+
+            }
+
+        },
+
+        scales: { y: { beginAtZero: true, suggestedMax: n * 0.8 } }
+
+    });
+
+}
+
+ 
+
+ 
+
+// ===================================================================================
+
+// PARTIE 2 : SIMULATION DE LA RANDOMISATION PAR BLOCS
+
+// ===================================================================================
+
+function simulateBlockRandomization() {
+
+    const n = parseInt(document.getElementById('block-n').value);
+
+    let blockListHTML = '<b class="block">Séquence des blocs (T=Traité, P=Placebo) :</b>';
+
+    const numBlocks = n / 4;
+
+    for (let i = 0; i < numBlocks; i++) {
+
+        let block = ['T', 'T', 'P', 'P'];
+
+        for (let j = block.length - 1; j > 0; j--) { const k = Math.floor(Math.random() * (j + 1)); [block[j], block[k]] = [block[k], block[j]]; }
+
+        blockListHTML += `<span class="inline-block p-1 border bg-white rounded m-1 font-mono">${block.join(', ')}</span>`;
+
+    }
+
+    
+
+    document.getElementById('block-results-summary').innerHTML = `Sur <b>${n}</b> participants :<br>
+
+         - Traité : <b>${n/2}</b> | Placebo : <b>${n/2}</b><br>
+
+         <b class="text-green-700">L'équilibre des effectifs est parfaitement maintenu.</b>`;
+
+    document.getElementById('block-list-summary').innerHTML = blockListHTML;
+
+    
+
+    createOrUpdateChart('blockChart', {
+
+        labels: ['Traité', 'Placebo'],
+
+        datasets: [{ data: [n/2, n/2], backgroundColor: [TRAITE_COLOR, PLACEBO_COLOR] }]
+
+    }, {
+
+        plugins: {
+
+            legend: { display: false },
+
+            datalabels: {
+
+                anchor: 'center',
+
+                align: 'center',
+
+                color: '#1e293b', // slate-800
+
+                font: { weight: 'bold' },
+
+                formatter: (value) => `${value}\n(50.0%)`
+
+            }
+
+        },
+
+        scales: { y: { beginAtZero: true, suggestedMax: n * 0.8 } }
+
+    });
+
+}
+
+ 
+
+ 
+
+// ===================================================================================
+
+// PARTIE 3 : SIMULATION POPULATION ET RANDOMISATION PAR BLOCS
+
+// ===================================================================================
+
+function simulatePopulationAndBlockRandomization() {
+
+    const n = parseInt(document.getElementById('population-n').value);
+
+    const sample = Array.from({ length: n }, () => Math.random() < 0.5 ? 'man' : 'woman');
+
+    const sampleMenCount = sample.filter(p => p === 'man').length;
+
+    const sampleWomenCount = n - sampleMenCount;
+
+    document.getElementById('population-sample-summary').innerHTML = `<b>1. Échantillon recruté (n=${n}) :</b> <b>${sampleMenCount} H</b> (${(sampleMenCount/n*100).toFixed(1)}%) et <b>${sampleWomenCount} F</b> (${(sampleWomenCount/n*100).toFixed(1)}%).`;
+
+ 
+
+    const blockAssignments = [];
+
+    for (let i = 0; i < n / 4; i++) {
+
+        let block = ['T', 'T', 'P', 'P'];
+
+        for (let j = block.length - 1; j > 0; j--) { const k = Math.floor(Math.random() * (j + 1)); [block[j], block[k]] = [block[k], block[j]]; }
+
+        blockAssignments.push(...block);
+
+    }
+
+    
+
+    const traite = [], placebo = [];
+
+    for(let i=0; i < n; i++) {
+
+        (blockAssignments[i] === 'T' ? traite : placebo).push({ sex: sample[i] });
+
+    }
+
+    
+
+    const menInT = traite.filter(p => p.sex === 'man').length, womenInT = traite.length - menInT;
+
+    const menInP = placebo.filter(p => p.sex === 'man').length, womenInP = placebo.length - menInP;
+
+    document.getElementById('population-results-summary').innerHTML = `<b>2. Répartition après randomisation par blocs :</b><br>
+
+        - <b>Traité:</b> ${menInT} H / ${womenInT} F | <b>Placebo:</b> ${menInP} H / ${womenInP} F<br>
+
+        <b class="text-red-700">Un déséquilibre sur le sexe peut apparaître par hasard !</b>`;
+
+ 
+
+    createOrUpdateChart('populationResultChart', {
+
+        labels: ['Traité', 'Placebo'],
+
+        datasets: [
+
+            { label: 'Hommes', data: [menInT, menInP], backgroundColor: MAN_COLOR },
+
+            { label: 'Femmes', data: [womenInT, womenInP], backgroundColor: WOMAN_COLOR }
+
+        ]
+
+    }, {
+
+        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+
+        plugins: {
+
+            title: { display: true, text: 'Composition des groupes' },
+
+            datalabels: {
+
+                anchor: 'center',
+
+                align: 'center',
+
+                color: 'white', font: { weight: 'bold' },
+
+                formatter: (value, context) => {
+
+                    const totalInBar = context.chart.data.datasets.reduce((sum, dataset) => sum + dataset.data[context.dataIndex], 0);
+
+                    if (value === 0 || totalInBar === 0) return '';
+
+                    return `${value}\n(${(value/totalInBar*100).toFixed(0)}%)`;
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+ 
+
+ 
+
+// ===================================================================================
+
+// PARTIE 4 : SIMULATION DE LA RANDOMISATION STRATIFIÉE
+
+// ===================================================================================
+
+function simulateStratifiedRandomization() {
+
+    const n = parseInt(document.getElementById('stratified-n').value);
+
+    const sample = Array.from({ length: n }, () => Math.random() < 0.5 ? 'man' : 'woman');
+
+    const men = sample.filter(p => p === 'man'), women = sample.filter(p => p === 'woman');
+
+    document.getElementById('stratified-sample-summary').innerHTML = `<b>Échantillon (n=${n}):</b> ${men.length} H et ${women.length} F. On crée deux strates.`;
+
+    
+
+    const randomizeStratum = (stratum) => {
+
+        const assignments = []; const numBlocks = Math.floor(stratum.length / 4);
+
+        for (let i = 0; i < numBlocks; i++) { let block = ['T','T','P','P']; for(let j=block.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[block[j],block[k]]=[block[k],block[j]];} assignments.push(...block); }
+
+        const remaining = stratum.length % 4;
+
+        if (remaining > 0) { let block = ['T','T','P','P']; for(let j=block.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[block[j],block[k]]=[block[k],block[j]];} assignments.push(...block.slice(0, remaining)); }
+
+        return assignments;
+
+    };
+
+    
+
+    const menAssignments = randomizeStratum(men), womenAssignments = randomizeStratum(women);
+
+    document.getElementById('stratified-men-summary').innerHTML = `<b>Strate Hommes (${men.length}) :</b> ${menAssignments.filter(p=>p==='T').length} T / ${menAssignments.filter(p=>p==='P').length} P.`;
+
+    document.getElementById('stratified-women-summary').innerHTML = `<b>Strate Femmes (${women.length}) :</b> ${womenAssignments.filter(p=>p==='T').length} T / ${womenAssignments.filter(p=>p==='P').length} P.`;
+
+ 
+
+    const traite = [], placebo = [];
+
+    men.forEach((p, i) => { (menAssignments[i] === 'T' ? traite : placebo).push({sex: p}); });
+
+    women.forEach((p, i) => { (womenAssignments[i] === 'T' ? traite : placebo).push({sex: p}); });
+
+ 
+
+    const menInT = traite.filter(p => p.sex === 'man').length, womenInT = traite.length - menInT;
+
+    const menInP = placebo.filter(p => p.sex === 'man').length, womenInP = placebo.length - menInP;
+
+    document.getElementById('stratified-results-summary').innerHTML = `<b>Résultat final :</b><br>
+
+        - <b>Traité (${traite.length}):</b> ${menInT} H / ${womenInT} F | <b>Placebo (${placebo.length}):</b> ${menInP} H / ${womenInP} F<br>
+
+        <b class="text-green-700">La stratification a prévenu le déséquilibre sur le sexe !</b>`;
+
+ 
+
+    createOrUpdateChart('stratifiedResultChart', {
+
+        labels: ['Traité', 'Placebo'],
+
+        datasets: [
+
+            { label: 'Hommes', data: [menInT, menInP], backgroundColor: MAN_COLOR },
+
+            { label: 'Femmes', data: [womenInT, womenInP], backgroundColor: WOMAN_COLOR }
+
+        ]
+
+    }, {
+
+        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+
+        plugins: {
+
+            title: { display: true, text: 'Composition des groupes' },
+
+             datalabels: {
+
+                anchor: 'center',
+
+                align: 'center',
+
+                color: 'white', font: { weight: 'bold' },
+
+                formatter: (value, context) => {
+
+                    const totalInBar = context.chart.data.datasets.reduce((sum, dataset) => sum + dataset.data[context.dataIndex], 0);
+
+                    if (value === 0 || totalInBar === 0) return '';
+
+                    return `${value}\n(${(value/totalInBar*100).toFixed(0)}%)`;
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+ 
+
+ 
+
+// Lancer la première simulation au chargement de la page
+
+window.onload = () => {
+
+    simulateSimpleRandomization();
+
+};
+
+</script>
+
+ 
+
+</body>
+
+</html>
