@@ -8,7 +8,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Apprentissage de la Lecture Critique : La Randomisation</title>
+    <title>LCA Lyon Sud : La Randomisation</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -72,9 +72,9 @@
 
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
 
-            <h1 class="text-4xl font-bold text-slate-900">Apprendre la Lecture Critique d'Article</h1>
+            <h1 class="text-4xl font-bold text-slate-900">LCA Lyon Sud</h1>
 
-            <p class="mt-2 text-xl text-slate-600">Module Interactif sur la Randomisation</p>
+            <p class="mt-2 text-xl text-slate-600">Outil Interactif sur la Randomisation</p>
 
         </div>
 
@@ -140,11 +140,11 @@
 
             <h2 class="text-2xl font-bold text-green-700 border-b-2 border-green-100 pb-2">2. Randomisation par Blocs</h2>
 
-            <p class="mt-4 text-slate-600">La randomisation par blocs garantit un équilibre régulier de la taille des groupes en randomisant par "blocs" de taille fixe (ici, 4), où chaque bloc contient 2 "Traité" et 2 "Placebo".</p>
+            <p class="mt-4 text-slate-600">La randomisation par blocs garantit un équilibre de la taille des groupes en randomisant des "blocs" de taille fixe (ici, 4) ou variable, où chaque bloc contient autant de "Traité" que de "Placebo".</p>
 
             <div class="mt-6 p-4 bg-slate-100 rounded-md flex items-center gap-4 flex-wrap">
 
-                <label for="block-n" class="font-bold">Nb. de participants (multiple de 4) :</label>
+                <label for="block-n" class="font-bold">Nb. de participants :</label>
 
                 <input type="number" id="block-n" value="32" min="8" max="500" step="4" class="w-24 p-2 border border-slate-300 rounded-md">
 
@@ -190,13 +190,13 @@
 
         <section id="population-randomization" class="bg-white p-6 rounded-lg shadow-lg hidden hidden-section">
 
-            <h2 class="text-2xl font-bold text-amber-700 border-b-2 border-amber-100 pb-2">3. Blocs & Facteurs Pronostiques</h2>
+            <h2 class="text-2xl font-bold text-amber-700 border-b-2 border-amber-100 pb-2">3. Déséquilibre de Facteurs Pronostiques</h2>
 
-            <p class="mt-4 text-slate-600">Même avec des effectifs équilibrés, un déséquilibre peut survenir sur des facteurs importants (ex: le sexe). Une randomisation par blocs simple ne garantit PAS que les proportions H/F seront égales dans les groupes finaux.</p>
+            <p class="mt-4 text-slate-600">Même avec des effectifs équilibrés, un déséquilibre peut survenir par hasard sur n'importe quel caractéristique (par ex: le sexe), qui s'il s'agit d'un facteur pronostique important, peut entraîner une non-comparabilité des groupes. Une randomisation par blocs simple ne garantit PAS que les proportions H/F seront égales dans les groupes finaux.</p>
 
             <div class="mt-6 p-4 bg-slate-100 rounded-md flex items-center gap-4 flex-wrap">
 
-                <label for="population-n" class="font-bold">Taille de l'échantillon (multiple de 4) :</label>
+                <label for="population-n" class="font-bold">Taille de l'échantillon :</label>
 
                 <input type="number" id="population-n" value="40" min="12" max="500" step="4" class="w-24 p-2 border border-slate-300 rounded-md">
 
@@ -244,7 +244,7 @@
 
             <h2 class="text-2xl font-bold text-pink-700 border-b-2 border-pink-100 pb-2">4. Randomisation Stratifiée</h2>
 
-            <p class="mt-4 text-slate-600">Pour garantir l'équilibre d'un facteur, on applique une randomisation par blocs <b>séparément dans chaque strate</b> (hommes et femmes). Cela garantit un équilibre quasi-parfait du facteur entre les groupes.</p>
+            <p class="mt-4 text-slate-600">Pour garantir l'équilibre d'un facteur entre les 2 groupes, on établit 2 listes de randomisation distinctes, <b>séparément dans chaque strate</b> (hommes et femmes). Cela garantit un équilibre quasi-parfait du facteur entre les groupes.</p>
 
              <div class="mt-6 p-4 bg-slate-100 rounded-md flex items-center gap-4 flex-wrap">
 
@@ -292,7 +292,7 @@
 
     <footer class="text-center py-6 text-slate-500 text-sm">
 
-        <p>Créé pour l'apprentissage de la lecture critique.</p>
+        <p>Antoine Gavoille - V1 - 19/06/2025.</p>
 
     </footer>
 
