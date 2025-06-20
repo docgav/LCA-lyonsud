@@ -434,7 +434,7 @@ function renderLogRankSection() {
     document.getElementById('log-rank-result').innerHTML = `
         <h3 class="text-lg font-bold">Résultat du Test Log-Rank</h3>
         <p class="text-3xl font-mono mt-2">${results.p_value < 0.001 ? "p < 0.001" : `p ≈ ${results.p_value.toFixed(3)}`}</p>
-        <p>(Chi² = ${results.chi2.toFixed(2)})</p>
+        <p>(Statistique de test = ${results.chi2.toFixed(2)})</p>
         <p class="mt-2 ${results.p_value < 0.05 ? 'text-green-600' : 'text-red-600'}">${results.p_value < 0.05 ? 'Différence statistiquement significative.' : 'Pas de différence statistiquement significative.'}</p>
     `;
     document.getElementById('log-rank-table').innerHTML = `
