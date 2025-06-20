@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apprentissage de la Lecture Critique : Analyse de Survie</title>
+    <title>LCA Lyon Sud : Analyse de Survie</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
@@ -24,8 +24,8 @@
 
     <header class="bg-white shadow-md">
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl font-bold text-slate-900">Apprendre la Lecture Critique d'Article</h1>
-            <p class="mt-2 text-xl text-slate-600">Module Interactif sur l'Analyse de Survie</p>
+            <h1 class="text-4xl font-bold text-slate-900">LCA Lyon Sud</h1>
+            <p class="mt-2 text-xl text-slate-600">Outil Interactif sur l'Analyse de Survie</p>
         </div>
     </header>
 
@@ -33,7 +33,7 @@
         <!-- PARTIE 1 : VISUALISATION DES DONNÉES ET ANALYSE À UN TEMPS FIXE -->
         <section id="data-visualization" class="bg-white p-6 rounded-lg shadow-lg">
             <h2 class="text-2xl font-bold text-purple-700 border-b-2 border-purple-100 pb-2">1. Visualisation des données & Analyse à un temps T</h2>
-            <p class="mt-4 text-slate-600">Visualisez le suivi de chaque patient. Un événement est marqué par une croix (X), un perdu de vue par une barre verticale (|), et une fin d'étude sans événement par une flèche (>). Déplacez le curseur pour voir comment l'analyse à un temps fixe change les résultats et exclut une partie de l'information.</p>
+            <p class="mt-4 text-slate-600">Dans une étude épidémiologique, on va souvent s’intéresser à l’effet d’un traitement ou d’un facteur de risque sur la survenue future d’un événement, comme le décès, ou un infarctus. On va ainsi par exemple randomiser nos patients entre un groupe traité et contrôle, et les suivres pendant une période de temps donnée, souvent définie à l’avance, jusqu’à une date de fin d’étude, que l’on appelle aussi date de point. Un patient peut se retrouver dans 3 cas différents: soit il a présenté l’événement d’intérêt lors de son suivi (X), soit il a été suivi pendant toute la durée de l’étude sans avoir présenté l’événement d’intérêt (>), soit il a été perdu de vue à un moment de l’étude (|). On pourrait choisir d’étudier la survenue de l’événement comme un critère binaire, oui ou non, pour comparer la proportion de patients ayant présenté l’événement entre le groupe traité et le groupe contrôle.Dans ce cas, cela nécessite obligatoirement de choisir un temps d’analyse. <br>Commencez par explorer les données simulées ci-dessous. Modifiez les paramètres pour voir l'impact du nombre de patients ou de l'efficacité du traitement sur les données générées.</p>
             <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-slate-100 rounded-md">
                 <div>
                     <label class="font-bold text-slate-700">Nombre de patients :</label>
@@ -52,9 +52,11 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-4"><canvas id="patient-lines-chart"></canvas></div>
+            <p class="text-sm text-center mt-4 text-slate-500">Le graphique ci-dessous représente chaque patient par une ligne. La longueur de la ligne indique la durée de son suivi.</p>
+            <div class="mt-2"><canvas id="patient-lines-chart"></canvas></div>
             <div class="mt-2 p-4 bg-slate-100 rounded-md">
-                 <label for="time-slider" class="font-bold">Temps d'analyse : <span class="text-purple-700 font-mono time-value">18</span> mois</label>
+                 <p class="text-slate-600">Analyser à un temps fixe en comparant des risques d'événement est simple mais incomplet. Déplacez le curseur ci-dessous pour changer le "moment de la photo". Observez comment le nombre de patients inclus dans l'analyse, les résultats et la p-value changent radicalement en fonction du temps choisi.</p>
+                 <label for="time-slider" class="font-bold block mt-2">Temps d'analyse : <span class="text-purple-700 font-mono time-value">18</span> mois</label>
                  <input type="range" id="time-slider" min="0" max="36" value="18" step="1" class="w-full mt-2 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
             </div>
             <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -67,7 +69,7 @@
         <!-- PARTIE 2 : COURBE DE SURVIE GLOBALE -->
         <section id="kaplan-meier-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
             <h2 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-100 pb-2">2. La Courbe de Kaplan-Meier (Population Totale)</h2>
-            <p class="mt-4 text-slate-600">Pour utiliser toute l'information, on construit une courbe "en escalier" pour la population entière. La probabilité de survie ne diminue qu'au moment précis où un événement survient. Les petites barres verticales (|) sur la courbe indiquent les temps de censure. La médiane de survie (temps où 50% des patients ont survécu) est indiquée par les lignes pointillées.</p>
+            <p class="mt-4 text-slate-600">Au lieu d'analyser les patients à un temps fixe sous forme d'un critère binaire, l'analyse de survie va étudier <b>le temps mis par les patients jusqu'à présenter l'événement</b>. Pour utiliser toute l'information, on construit une courbe de survie "en escalier" à partir de l'estimateur de Kaplan-Meier pour la population entière. On part de 100%, puis la probabilité de survie ne diminue qu'au moment précis où un événement survient. Les petites barres verticales (|) sur la courbe indiquent les temps de censure : ces patients ne font pas chuter la courbe, mais sont retirés du calcul pour les temps futurs. La médiane de survie (temps où 50% des patients ont survécu) est indiquée par les lignes pointillées. La zone ombrée représente l'intervalle de confiance à 95%.</p>
             <div class="mt-4"><canvas id="km-chart-single"></canvas></div>
             <div class="mt-2 p-4 bg-slate-100 rounded-md">
                 <label for="km-time-slider-single" class="font-bold">Explorer le temps : <span id="km-time-value-single" class="text-teal-700 font-mono">0</span> mois</label>
@@ -80,7 +82,7 @@
         <!-- PARTIE 3: COMPARAISON DES GROUPES -->
         <section id="km-group-comparison-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
             <h2 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-100 pb-2">3. Comparaison des Groupes par Kaplan-Meier</h2>
-            <p class="mt-4 text-slate-600">On peut maintenant tracer une courbe pour chaque groupe afin de comparer visuellement leur pronostic. Le curseur permet toujours d'explorer les probabilités à un temps T pour chaque groupe.</p>
+            <p class="mt-4 text-slate-600">La véritable puissance de cette méthode est de comparer les courbes entre les groupes. On peut maintenant tracer une courbe pour chaque groupe afin de comparer visuellement leur pronostic. Un écart entre les courbes suggère un effet du traitement. Le bouton ci-dessous permet de voir les données en termes d'incidence cumulative (1 - Survie), ce qui est parfois plus intuitif pour représenter le risque d'événement.</p>
             <div class="mt-6 flex justify-center items-center gap-4">
                 <label class="font-bold">Afficher :</label>
                 <button id="toggle-survival" class="px-4 py-2 toggle-btn-active rounded-md">Survie</button>
@@ -97,7 +99,7 @@
         <!-- PARTIE 4 : LOG-RANK -->
         <section id="log-rank-comparison" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
             <h2 class="text-2xl font-bold text-sky-700 border-b-2 border-sky-100 pb-2">4. Comparaison statistique : le test du Log-Rank</h2>
-            <p class="mt-4 text-slate-600">Le test du Log-Rank compare les deux courbes sur toute leur durée. À chaque événement, il compare le nombre d'événements observés à celui attendu si les deux groupes étaient identiques. L'addition de ces petites différences permet de calculer un score global (Chi²) et une p-value.</p>
+            <p class="mt-4 text-slate-600">L'inspection visuelle ne suffit pas. Le test du Log-Rank est le test statistique classique pour déterminer si l'écart entre les deux courbes est significatif ou simplement dû au hasard. Il compare, à chaque temps d'événement, le nombre de cas observés dans chaque groupe au nombre de cas attendus si le traitement n'avait aucun effet. Une p-value <0.05 indique que la différence observée est statistiquement significative.</p>
              <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
                  <div class="bg-slate-50 p-4 rounded-lg">
                      <h3 class="text-lg font-bold text-center">Comparaison des Courbes</h3>
@@ -481,6 +483,7 @@ function showNext(sectionId) {
         section.style.display = 'block';
         if (!section.hasAttribute('data-simulated')) {
             if (sectionId === 'kaplan-meier-section') renderKMSingleChart(); 
+            if (sectionId === 'km-group-comparison-section') renderKMGroupChart();
             if (sectionId === 'log-rank-comparison') renderLogRankSection();
             section.setAttribute('data-simulated', 'true');
         }
@@ -488,10 +491,8 @@ function showNext(sectionId) {
     }
 }
 function switchToGroupComparison() {
-    document.getElementById('km-view-single').style.display = 'none';
-    const groupView = document.getElementById('km-view-groups');
-    groupView.classList.remove('hidden-view');
-    renderKMGroupChart('survival'); 
+    document.getElementById('kaplan-meier-section').style.display = 'none'; // Hide single view section
+    showNext('km-group-comparison-section');
 }
 </script>
 </body>
