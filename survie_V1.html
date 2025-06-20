@@ -64,42 +64,52 @@
             <div class="mt-8 text-right"><button onclick="showNext('kaplan-meier-section')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Passer à l'Analyse de Survie Complète →</button></div>
         </section>
 
-        <!-- PARTIE 2 : KAPLAN-MEIER -->
+        <!-- PARTIE 2 : COURBE DE SURVIE GLOBALE -->
         <section id="kaplan-meier-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
-            <!-- Vue 1: Courbe unique -->
-            <div id="km-view-single">
-                <h2 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-100 pb-2">2a. La Courbe de Kaplan-Meier (Population Totale)</h2>
-                <p class="mt-4 text-slate-600">Pour utiliser toute l'information, on construit une courbe "en escalier" pour la population entière. La probabilité de survie ne diminue qu'au moment précis où un événement survient. Les petites barres verticales (|) sur la courbe indiquent les temps de censure. La médiane de survie (temps où 50% des patients ont survécu) est indiquée par les lignes pointillées.</p>
-                <div class="mt-4"><canvas id="km-chart-single"></canvas></div>
-                <div class="mt-2 p-4 bg-slate-100 rounded-md">
-                    <label for="km-time-slider-single" class="font-bold">Explorer le temps : <span id="km-time-value-single" class="text-teal-700 font-mono">0</span> mois</label>
-                    <input type="range" id="km-time-slider-single" min="0" max="36" value="0" step="1" class="w-full mt-2 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                </div>
-                <div id="km-stats-single" class="mt-4 p-4 grid grid-cols-1 md:grid-cols-3 text-center bg-teal-50 border border-teal-200 rounded-md"></div>
-                <div class="mt-8 text-right"><button onclick="switchToGroupComparison()" class="px-5 py-2 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 transition">Comparer les Groupes →</button></div>
+            <h2 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-100 pb-2">2. La Courbe de Kaplan-Meier (Population Totale)</h2>
+            <p class="mt-4 text-slate-600">Pour utiliser toute l'information, on construit une courbe "en escalier" pour la population entière. La probabilité de survie ne diminue qu'au moment précis où un événement survient. Les petites barres verticales (|) sur la courbe indiquent les temps de censure. La médiane de survie (temps où 50% des patients ont survécu) est indiquée par les lignes pointillées.</p>
+            <div class="mt-4"><canvas id="km-chart-single"></canvas></div>
+            <div class="mt-2 p-4 bg-slate-100 rounded-md">
+                <label for="km-time-slider-single" class="font-bold">Explorer le temps : <span id="km-time-value-single" class="text-teal-700 font-mono">0</span> mois</label>
+                <input type="range" id="km-time-slider-single" min="0" max="36" value="0" step="1" class="w-full mt-2 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
             </div>
-            <!-- Vue 2: Comparaison de groupes -->
-            <div id="km-view-groups" class="hidden-view">
-                <h2 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-100 pb-2">2b. Comparaison des Groupes par Kaplan-Meier</h2>
-                <p class="mt-4 text-slate-600">On peut maintenant tracer une courbe pour chaque groupe afin de comparer visuellement leur pronostic. Le curseur permet toujours d'explorer les probabilités à un temps T pour chaque groupe.</p>
-                <div class="mt-6 flex justify-center items-center gap-4">
-                    <label class="font-bold">Afficher :</label>
-                    <button id="toggle-survival" class="px-4 py-2 toggle-btn-active rounded-md">Survie</button>
-                    <button id="toggle-incidence" class="px-4 py-2 toggle-btn-inactive rounded-md">Incidence Cumulative</button>
-                </div>
-                <div class="mt-4"><canvas id="km-chart-groups"></canvas></div>
-                <div class="mt-2 p-4 bg-slate-100 rounded-md">
-                    <label for="km-time-slider-groups" class="font-bold">Explorer le temps : <span id="km-time-value-groups" class="text-teal-700 font-mono">0</span> mois</label>
-                    <input type="range" id="km-time-slider-groups" min="0" max="36" value="0" step="1" class="w-full mt-2 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                </div>
-                 <div class="mt-8 text-right"><button onclick="showNext('log-rank-comparison')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Passer au Test Statistique →</button></div>
-            </div>
+            <div id="km-stats-single" class="mt-4 p-4 grid grid-cols-1 md:grid-cols-3 text-center bg-teal-50 border border-teal-200 rounded-md"></div>
+            <div class="mt-8 text-right"><button onclick="showNext('km-group-comparison-section')" class="px-5 py-2 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 transition">Comparer les Groupes →</button></div>
         </section>
 
-        <!-- PARTIE 3 : LOG-RANK -->
+        <!-- PARTIE 3: COMPARAISON DES GROUPES -->
+        <section id="km-group-comparison-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
+            <h2 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-100 pb-2">3. Comparaison des Groupes par Kaplan-Meier</h2>
+            <p class="mt-4 text-slate-600">On peut maintenant tracer une courbe pour chaque groupe afin de comparer visuellement leur pronostic. Le curseur permet toujours d'explorer les probabilités à un temps T pour chaque groupe.</p>
+            <div class="mt-6 flex justify-center items-center gap-4">
+                <label class="font-bold">Afficher :</label>
+                <button id="toggle-survival" class="px-4 py-2 toggle-btn-active rounded-md">Survie</button>
+                <button id="toggle-incidence" class="px-4 py-2 toggle-btn-inactive rounded-md">Incidence Cumulative</button>
+            </div>
+            <div class="mt-4"><canvas id="km-chart-groups"></canvas></div>
+            <div class="mt-2 p-4 bg-slate-100 rounded-md">
+                <label for="km-time-slider-groups" class="font-bold">Explorer le temps : <span id="km-time-value-groups" class="text-teal-700 font-mono">0</span> mois</label>
+                <input type="range" id="km-time-slider-groups" min="0" max="36" value="0" step="1" class="w-full mt-2 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+            </div>
+            <div class="mt-8 text-right"><button onclick="showNext('log-rank-comparison')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Passer au Test Statistique →</button></div>
+        </section>
+
+        <!-- PARTIE 4 : LOG-RANK -->
         <section id="log-rank-comparison" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
-            <h2 class="text-2xl font-bold text-sky-700 border-b-2 border-sky-100 pb-2">3. Comparaison des courbes : le test du Log-Rank</h2>
-            <p class="mt-4 text-slate-600">À venir...</p>
+            <h2 class="text-2xl font-bold text-sky-700 border-b-2 border-sky-100 pb-2">4. Comparaison statistique : le test du Log-Rank</h2>
+            <p class="mt-4 text-slate-600">Le test du Log-Rank compare les deux courbes sur toute leur durée. À chaque événement, il compare le nombre d'événements observés à celui attendu si les deux groupes étaient identiques. L'addition de ces petites différences permet de calculer un score global (Chi²) et une p-value.</p>
+             <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                 <div class="bg-slate-50 p-4 rounded-lg">
+                     <h3 class="text-lg font-bold text-center">Comparaison des Courbes</h3>
+                    <canvas id="log-rank-chart"></canvas>
+                </div>
+                <div>
+                    <div id="log-rank-result" class="p-4 bg-sky-100 border border-sky-200 rounded-md text-center"></div>
+                    <h3 class="text-lg font-bold mt-6">Tableau Observé vs. Attendu</h3>
+                    <p class="text-sm text-slate-500">Ce tableau résume le nombre total d'événements observés et attendus (calculés sur l'ensemble des temps d'événements).</p>
+                    <div id="log-rank-table" class="mt-2"></div>
+                </div>
+            </div>
         </section>
     </main>
 <script>
@@ -151,7 +161,7 @@ const customCanvasDrawer = {
                     ctx.stroke();
                 }
             });
-             const timeSlider = document.getElementById('km-time-slider-single');
+            const timeSlider = document.getElementById('km-time-slider-single');
             const time = parseInt(timeSlider.value); const lineX = x.getPixelForValue(time);
             ctx.beginPath(); ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
             ctx.moveTo(lineX, y.top); ctx.lineTo(lineX, y.bottom); ctx.stroke(); ctx.setLineDash([]);
@@ -198,6 +208,9 @@ function fullSimulationUpdate() {
             const isIncidence = document.getElementById('toggle-incidence').classList.contains('toggle-btn-active');
             renderKMGroupChart(isIncidence ? 'incidence' : 'survival');
         }
+    }
+    if (document.getElementById('log-rank-comparison').style.display === 'block') {
+        renderLogRankSection();
     }
 }
 function generatePatientData(n_patients, effect_size) {
@@ -288,7 +301,7 @@ function updateSnapshotAnalysis() {
 }
 
 // ===================================================================================
-// LOGIQUE POUR LA PARTIE 2 (KAPLAN-MEIER)
+// LOGIQUE POUR LA PARTIE 2 & 3 (KAPLAN-MEIER & LOG-RANK)
 // ===================================================================================
 function calculateKaplanMeier(dataSubset) {
     if(!dataSubset || dataSubset.length === 0) return { table: [], median: { time: null, ci: [null, null]}, censoredTimes: [] };
@@ -362,6 +375,7 @@ function updateKMSingleStats(time) {
 function renderKMGroupChart(displayMode = 'survival') {
     const createChartPoints = (kmData, valueKey) => {
         const data = [{x: 0, y: 1}];
+        if(!kmData.table) return [];
         kmData.table.forEach((point) => { const lastPoint = data[data.length - 1]; if (lastPoint.x !== point.time) data.push({ x: point.time, y: lastPoint.y }); data.push({ x: point.time, y: point[valueKey] }); });
         const lastKmPoint = data[data.length - 1]; if (lastKmPoint && lastKmPoint.x < STUDY_END_TIME) data.push({ x: STUDY_END_TIME, y: lastKmPoint.y });
         return data.map(p => ({...p, y: p.y * 100}));
@@ -387,6 +401,65 @@ function updateKMGroupTooltip(time) {
     const chart = chartInstances['km-chart-groups']; if (chart) chart.update('none'); 
 }
 
+function performLogRankTest() {
+    const allEventsTimes = [...new Set(patientData.filter(p => p.status === 'Événement').map(p => p.time))].sort((a,b) => a-b);
+    let O_minus_E_sum = 0, variance_sum = 0;
+    let O_traite_total = 0, E_traite_total = 0, O_placebo_total = 0, E_placebo_total = 0;
+    for (const t of allEventsTimes) {
+        const at_risk_total = patientData.filter(p => p.time >= t).length;
+        const at_risk_traite = patientData.filter(p => p.group === 'Traité' && p.time >= t).length;
+        const events_total = patientData.filter(p => p.time === t && p.status === 'Événement').length;
+        if (at_risk_total < 2) continue;
+        const O_traite = patientData.filter(p => p.time === t && p.status === 'Événement' && p.group === 'Traité').length;
+        const E_traite = events_total * (at_risk_traite / at_risk_total);
+        O_traite_total += O_traite;
+        E_traite_total += E_traite;
+        O_placebo_total += (events_total - O_traite);
+        E_placebo_total += events_total * (1 - at_risk_traite / at_risk_total);
+        O_minus_E_sum += (O_traite - E_traite);
+        if (at_risk_total > 1) {
+            const variance_t = (events_total * at_risk_traite * (at_risk_total - at_risk_traite) * (at_risk_total - events_total)) / (Math.pow(at_risk_total, 2) * (at_risk_total - 1));
+            variance_sum += variance_t;
+        }
+    }
+    const chi2 = variance_sum > 0 ? Math.pow(O_minus_E_sum, 2) / variance_sum : 0;
+    const p_value = Math.exp(-0.5 * chi2);
+    return { chi2, p_value, O_traite: O_traite_total, E_traite: E_traite_total, O_placebo: O_placebo_total, E_placebo: E_placebo_total };
+}
+
+function renderLogRankSection() {
+    const results = performLogRankTest();
+    document.getElementById('log-rank-result').innerHTML = `
+        <h3 class="text-lg font-bold">Résultat du Test Log-Rank</h3>
+        <p class="text-3xl font-mono mt-2">${results.p_value < 0.001 ? "p < 0.001" : `p ≈ ${results.p_value.toFixed(3)}`}</p>
+        <p>(Chi² = ${results.chi2.toFixed(2)})</p>
+        <p class="mt-2 ${results.p_value < 0.05 ? 'text-green-600' : 'text-red-600'}">${results.p_value < 0.05 ? 'Différence statistiquement significative.' : 'Pas de différence statistiquement significative.'}</p>
+    `;
+    document.getElementById('log-rank-table').innerHTML = `
+        <table class="w-full text-center">
+            <thead class="bg-slate-200"><tr><th>Groupe</th><th class="p-2">Observé</th><th class="p-2">Attendu</th></tr></thead>
+            <tbody>
+                <tr class="border-b"><td class="p-2 font-bold text-cyan-700">Traité</td><td>${results.O_traite}</td><td>${results.E_traite.toFixed(1)}</td></tr>
+                <tr class="border-b"><td class="p-2 font-bold text-orange-500">Placebo</td><td>${results.O_placebo}</td><td>${results.E_placebo.toFixed(1)}</td></tr>
+            </tbody>
+        </table>`;
+    const createChartPoints = (kmData, valueKey) => {
+        const data = [{x: 0, y: 1}];
+        if(!kmData.table) return [];
+        kmData.table.forEach((point) => { const lastPoint = data[data.length - 1]; if (lastPoint.x !== point.time) data.push({ x: point.time, y: lastPoint.y }); data.push({ x: point.time, y: point[valueKey] }); });
+        const lastKmPoint = data[data.length - 1]; if (lastKmPoint && lastKmPoint.x < STUDY_END_TIME) data.push({ x: STUDY_END_TIME, y: lastKmPoint.y });
+        return data.map(p => ({...p, y: p.y * 100}));
+    };
+    let datasets = [
+        { label: 'Traité', data: createChartPoints(kaplanMeierData.traite, 'survival'), borderColor: TRAITE_COLOR, backgroundColor: TRAITE_COLOR, stepped: 'before', pointRadius: 0, fill: false },
+        { label: 'Placebo', data: createChartPoints(kaplanMeierData.placebo, 'survival'), borderColor: PLACEBO_COLOR, backgroundColor: PLACEBO_COLOR, stepped: 'before', pointRadius: 0, fill: false }
+    ];
+    createOrUpdateChart('log-rank-chart', 'line', { datasets }, {
+        scales: { x: { type: 'linear', min: 0, max: STUDY_END_TIME, title: { display: true, text: 'Temps (mois)' } }, y: { min: 0, max: 100, title: { display: true, text: 'Probabilité de survie (%)' }, ticks: {callback: (v) => v + '%'} } },
+        plugins: { legend: { position: 'bottom' }, datalabels: { display: false }, tooltip: { enabled: true } }
+    });
+}
+
 // ===================================================================================
 // GESTION DES ÉVÉNEMENTS
 // ===================================================================================
@@ -407,7 +480,8 @@ function showNext(sectionId) {
     if (section) {
         section.style.display = 'block';
         if (!section.hasAttribute('data-simulated')) {
-            if (sectionId === 'kaplan-meier-section') renderKMSingleChart();
+            if (sectionId === 'kaplan-meier-section') renderKMSingleChart(); 
+            if (sectionId === 'log-rank-comparison') renderLogRankSection();
             section.setAttribute('data-simulated', 'true');
         }
         setTimeout(() => { section.classList.add('visible-section'); section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
