@@ -13,7 +13,7 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         h1, h2, h3 { font-family: 'Roboto Slab', serif; }
-        .hidden-section, .hidden-view { display: none; }
+        .hidden-section { display: none; }
         .visible-section { display: block; opacity: 1; transform: translateY(0); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
         .control-radio:checked + label { background-color: #67e8f9; border-color: #06b6d4; color: #0e7490; }
         .toggle-btn-active { background-color: #06b6d4; color: white; }
@@ -30,7 +30,6 @@
     </header>
 
     <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12">
-        <!-- PARTIE 1 : VISUALISATION DES DONNÉES ET ANALYSE À UN TEMPS FIXE -->
         <section id="data-visualization" class="bg-white p-6 rounded-lg shadow-lg">
             <h2 class="text-2xl font-bold text-purple-700 border-b-2 border-purple-100 pb-2">1. Visualisation des données & Analyse à un temps T</h2>
             <p class="mt-4 text-slate-600">Dans une étude épidémiologique, on va souvent s’intéresser à l’effet d’un traitement ou d’un facteur de risque sur la survenue future d’un événement, comme le décès, ou un infarctus. On va ainsi par exemple randomiser nos patients entre un groupe traité et contrôle, et les suivres pendant une période de temps donnée, souvent définie à l’avance, jusqu’à une date de fin d’étude, que l’on appelle aussi date de point. Un patient peut se retrouver dans 3 cas différents: soit il a présenté l’événement d’intérêt lors de son suivi (X), soit il a été suivi pendant toute la durée de l’étude sans avoir présenté l’événement d’intérêt (>), soit il a été perdu de vue à un moment de l’étude (|). On pourrait choisir d’étudier la survenue de l’événement comme un critère binaire, oui ou non, pour comparer la proportion de patients ayant présenté l’événement entre le groupe traité et le groupe contrôle.Dans ce cas, cela nécessite obligatoirement de choisir un temps d’analyse. <br>Commencez par explorer les données simulées ci-dessous. Modifiez les paramètres pour voir l'impact du nombre de patients ou de l'efficacité du traitement sur les données générées.</p>
@@ -66,7 +65,6 @@
             <div class="mt-8 text-right"><button onclick="showNext('kaplan-meier-section')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Passer à l'Analyse de Survie Complète →</button></div>
         </section>
 
-        <!-- PARTIE 2 : COURBE DE SURVIE GLOBALE -->
         <section id="kaplan-meier-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
             <h2 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-100 pb-2">2. La Courbe de Kaplan-Meier (Population Totale)</h2>
             <p class="mt-4 text-slate-600">Au lieu d'analyser les patients à un temps fixe sous forme d'un critère binaire, l'analyse de survie va étudier <b>le temps mis par les patients jusqu'à présenter l'événement</b>. Pour utiliser toute l'information, on construit une courbe de survie "en escalier" à partir de l'estimateur de Kaplan-Meier pour la population entière. On part de 100%, puis la probabilité de survie ne diminue qu'au moment précis où un événement survient. Les petites barres verticales (|) sur la courbe indiquent les temps de censure : ces patients ne font pas chuter la courbe, mais sont retirés du calcul pour les temps futurs. La médiane de survie (temps où 50% des patients ont survécu) est indiquée par les lignes pointillées. La zone ombrée représente l'intervalle de confiance à 95%.</p>
@@ -79,7 +77,6 @@
             <div class="mt-8 text-right"><button onclick="showNext('km-group-comparison-section')" class="px-5 py-2 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 transition">Comparer les Groupes →</button></div>
         </section>
 
-        <!-- PARTIE 3: COMPARAISON DES GROUPES -->
         <section id="km-group-comparison-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
             <h2 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-100 pb-2">3. Comparaison des Groupes par Kaplan-Meier</h2>
             <p class="mt-4 text-slate-600">La véritable puissance de cette méthode est de comparer les courbes entre les groupes. On peut maintenant tracer une courbe pour chaque groupe afin de comparer visuellement leur pronostic. Un écart entre les courbes suggère un effet du traitement. Le bouton ci-dessous permet de voir les données en termes d'incidence cumulative (1 - Survie), ce qui est parfois plus adapté pour représenter le risque d'événement, comme un infarctus.</p>
@@ -96,23 +93,45 @@
             <div class="mt-8 text-right"><button onclick="showNext('log-rank-comparison')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Passer au Test Statistique →</button></div>
         </section>
 
-        <!-- PARTIE 4 : LOG-RANK -->
         <section id="log-rank-comparison" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
             <h2 class="text-2xl font-bold text-sky-700 border-b-2 border-sky-100 pb-2">4. Comparaison statistique : le test du Log-Rank</h2>
-            <p class="mt-4 text-slate-600">L'inspection visuelle ne suffit pas. Le test du Log-Rank est le test statistique classique pour déterminer si l'écart entre les deux courbes est significatif ou simplement dû au hasard. Il compare, à chaque temps d'événement, le nombre de cas observés dans chaque groupe au nombre de cas attendus si le traitement n'avait aucun effet. Une p-value <0.05 indique que la différence observée est statistiquement significative.</p>
+            <p class="mt-4 text-slate-600">L'inspection visuelle ne suffit pas. Le test du Log-Rank est le test statistique classique pour déterminer si l'écart entre les deux courbes est significatif ou simplement dû au hasard. Il compare, à chaque temps d'événement, le nombre de cas observés dans chaque groupe au nombre de cas attendus si le traitement n'avait aucun effet. Une p-value &lt;0.05 indique que la différence observée est statistiquement significative.</p>
              <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
                  <div class="bg-slate-50 p-4 rounded-lg">
                      <h3 class="text-lg font-bold text-center">Comparaison des Courbes</h3>
-                    <canvas id="log-rank-chart"></canvas>
-                </div>
-                <div>
-                    <div id="log-rank-result" class="p-4 bg-sky-100 border border-sky-200 rounded-md text-center"></div>
-                    <h3 class="text-lg font-bold mt-6">Tableau Observé vs. Attendu</h3>
-                    <p class="text-sm text-slate-500">Ce tableau résume le nombre total d'événements observés et attendus (calculés sur l'ensemble des temps d'événements).</p>
-                    <div id="log-rank-table" class="mt-2"></div>
-                </div>
+                     <canvas id="log-rank-chart"></canvas>
+                 </div>
+                 <div>
+                     <div id="log-rank-result" class="p-4 bg-sky-100 border border-sky-200 rounded-md text-center"></div>
+                     <h3 class="text-lg font-bold mt-6">Tableau Observé vs. Attendu</h3>
+                     <p class="text-sm text-slate-500">Ce tableau résume le nombre total d'événements observés et attendus (calculés sur l'ensemble des temps d'événements).</p>
+                     <div id="log-rank-table" class="mt-2"></div>
+                 </div>
+            </div>
+            <div class="mt-8 text-right"><button onclick="showNext('cox-model-section')" class="px-5 py-2 bg-sky-600 text-white font-semibold rounded-md hover:bg-sky-700 transition">Aller plus loin avec le Modèle de Cox →</button></div>
+        </section>
+
+        <section id="cox-model-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
+            <h2 class="text-2xl font-bold text-rose-700 border-b-2 border-rose-100 pb-2">5. Quantification de l'Effet : le Modèle de Cox</h2>
+            <p class="mt-4 text-slate-600">Le test du Log-Rank nous dit s'il existe une différence significative, mais il ne quantifie pas l'<b>ampleur de l'effet</b> du traitement. Pour cela, on utilise le <b>modèle de régression de Cox</b>. Ce modèle estime le <b>Hazard Ratio (HR)</b>, qui représente le rapport des risques instantanés d'événement entre les deux groupes.
+            <br>
+            - Un <b>HR &lt; 1</b> indique que le traitement réduit le risque (effet protecteur).
+            <br>
+            - Un <b>HR > 1</b> indique que le traitement augmente le risque.
+            <br>
+            - Un <b>HR = 1</b> indique une absence d'effet.
+            </p>
+            <div id="cox-model-result" class="mt-6 p-6 bg-rose-50 border border-rose-200 rounded-lg text-center"></div>
+            <div class="mt-6 p-4 bg-slate-100 rounded-md text-slate-700">
+                <h3 class="font-bold text-lg">Au-delà de la comparaison de deux groupes</h3>
+                <p class="mt-2">Le modèle de Cox est plus flexible que le Log-Rank :</p>
+                <ul class="list-disc list-inside mt-2 space-y-1">
+                    <li>Il peut analyser l'effet d'une <b>variable continue</b> (ex: l'âge, une valeur biologique) sur la survie, ce qui est impossible avec le Log-Rank qui ne compare que des groupes.</li>
+                    <li>Il permet des <b>analyses multivariées</b> pour ajuster l'effet du traitement sur d'autres facteurs de confusion (ex: âge, sexe, comorbidités) et ainsi isoler l'effet propre du traitement.</li>
+                </ul>
             </div>
         </section>
+
     </main>
 <script>
 // ===================================================================================
@@ -181,7 +200,8 @@ const customCanvasDrawer = {
 };
 Chart.register(ChartDataLabels, customCanvasDrawer);
 const TRAITE_COLOR = 'rgba(34, 211, 238, 0.8)'; const PLACEBO_COLOR = 'rgba(251, 146, 60, 0.8)';
-let patientData = []; let kaplanMeierData = {}; const STUDY_END_TIME = 36;
+let patientData = []; let kaplanMeierData = {}; let logRankResults = {};
+const STUDY_END_TIME = 36;
 const chartInstances = {};
 function createOrUpdateChart(canvasId, type, data, options) {
     const ctx = document.getElementById(canvasId).getContext('2d');
@@ -193,7 +213,7 @@ function createOrUpdateChart(canvasId, type, data, options) {
 }
 
 // ===================================================================================
-// LOGIQUE PRINCIPALE ET PARTIE 1
+// LOGIQUE PRINCIPALE
 // ===================================================================================
 function fullSimulationUpdate() {
     const n_patients = document.querySelector('input[name="n_patients"]:checked').value;
@@ -204,15 +224,20 @@ function fullSimulationUpdate() {
     kaplanMeierData.all = calculateKaplanMeier(patientData);
     kaplanMeierData.traite = calculateKaplanMeier(patientData.filter(p => p.group === 'Traité'));
     kaplanMeierData.placebo = calculateKaplanMeier(patientData.filter(p => p.group === 'Placebo'));
+    logRankResults = performLogRankTest();
+
     if (document.getElementById('kaplan-meier-section').style.display === 'block') {
-        if(document.getElementById('km-view-single').style.display !== 'none') renderKMSingleChart();
-        else {
-            const isIncidence = document.getElementById('toggle-incidence').classList.contains('toggle-btn-active');
-            renderKMGroupChart(isIncidence ? 'incidence' : 'survival');
-        }
+        renderKMSingleChart();
+    }
+    if (document.getElementById('km-group-comparison-section').style.display === 'block') {
+         const isIncidence = document.getElementById('toggle-incidence').classList.contains('toggle-btn-active');
+         renderKMGroupChart(isIncidence ? 'incidence' : 'survival');
     }
     if (document.getElementById('log-rank-comparison').style.display === 'block') {
         renderLogRankSection();
+    }
+    if (document.getElementById('cox-model-section').style.display === 'block') {
+        renderCoxModelSection();
     }
 }
 function generatePatientData(n_patients, effect_size) {
@@ -248,7 +273,7 @@ function updateSnapshotAnalysis() {
     const analysisTime = parseInt(document.getElementById('time-slider').value);
     document.querySelectorAll('.time-value').forEach(el => el.textContent = analysisTime);
     if(chartInstances['patient-lines-chart']) chartInstances['patient-lines-chart'].update('none');
-    
+   
     const totalTraite = patientData.filter(p => p.group === 'Traité').length;
     const lostBeforeTraite = patientData.filter(p => p.group === 'Traité' && p.status === 'Censuré' && p.time < analysisTime).length;
     const denominatorTraite = totalTraite - lostBeforeTraite;
@@ -261,7 +286,7 @@ function updateSnapshotAnalysis() {
 
     const rateTraite = denominatorTraite > 0 ? numeratorTraite / denominatorTraite : 0;
     const ratePlacebo = denominatorPlacebo > 0 ? numeratorPlacebo / denominatorPlacebo : 0;
-    
+   
     let rr, ci_low, ci_high, p_value;
     const a = numeratorTraite, b = denominatorTraite - numeratorTraite, c = numeratorPlacebo, d = denominatorPlacebo - numeratorPlacebo;
 
@@ -279,10 +304,11 @@ function updateSnapshotAnalysis() {
         ci_low = Math.exp(logRR - 1.96 * seLogRR);
         ci_high = Math.exp(logRR + 1.96 * seLogRR);
         const z = logRR / seLogRR;
-        const standardNormalCdf = (x) => 0.5 * (1 + (x / (Math.sqrt(2))) / (x === 0 ? 1 : Math.abs(x / (Math.sqrt(2)))) * Math.sqrt(1 - Math.exp(-x*x)));
+        // Simple approximation for Normal CDF
+        const standardNormalCdf = (z) => 0.5 * (1 + Math.sign(z) * Math.sqrt(1 - Math.exp(-2 * z * z / Math.PI)));
         p_value = 2 * (1 - standardNormalCdf(Math.abs(z)));
     }
-    
+   
     document.getElementById('stats-result').innerHTML = `
         <div class="space-y-4 text-sm">
             <div><h4 class="font-bold text-cyan-700">Risque Groupe Traité</h4><p class="font-mono text-lg">${(rateTraite * 100).toFixed(1)}%</p><p class="text-xs font-mono">(${numeratorTraite} événements / ${denominatorTraite} à risque)</p></div>
@@ -293,7 +319,7 @@ function updateSnapshotAnalysis() {
             <div class="text-sm">IC 95% : [<span class="font-mono">${isFinite(ci_low) ? ci_low.toFixed(2) : "N/A"}</span> ; <span class="font-mono">${isFinite(ci_high) ? ci_high.toFixed(2) : "N/A"}</span>]</div>
             <div class="text-sm">p-value (Z-test) : <span class="font-mono">${isFinite(p_value) ? p_value.toFixed(3) : "N/A"}</span></div>
         </div>`;
-    
+   
     createOrUpdateChart('event-rate-chart', 'bar', {
         labels: ['Traité', 'Placebo'], datasets: [{ data: [rateTraite*100, ratePlacebo*100], backgroundColor: [TRAITE_COLOR, PLACEBO_COLOR] }]
     }, { plugins: { legend: { display: false }, datalabels: { anchor: 'center', align: 'center', color: '#1e293b', font: { weight: 'bold'}, formatter: (v) => `${v.toFixed(1)}%` }, title: {display: true, text: "% d'événements parmi les patients à risque"} }, scales: { y: { min: 0, max: 100, ticks: {callback: (v) => v + '%'} } } });
@@ -303,7 +329,7 @@ function updateSnapshotAnalysis() {
 }
 
 // ===================================================================================
-// LOGIQUE POUR LA PARTIE 2 & 3 (KAPLAN-MEIER & LOG-RANK)
+// LOGIQUE POUR LA PARTIE 2, 3, 4 & 5
 // ===================================================================================
 function calculateKaplanMeier(dataSubset) {
     if(!dataSubset || dataSubset.length === 0) return { table: [], median: { time: null, ci: [null, null]}, censoredTimes: [] };
@@ -393,7 +419,7 @@ function renderKMGroupChart(displayMode = 'survival') {
     }
     createOrUpdateChart('km-chart-groups', 'line', { datasets }, {
         scales: { x: { type: 'linear', min: 0, max: STUDY_END_TIME, title: { display: true, text: 'Temps (mois)' } }, y: { min: 0, max: 100, title: { display: true, text: yAxisTitle }, ticks: {callback: (v) => v + '%'} } },
-        plugins: { legend: { position: 'bottom' }, datalabels: { display: false }, tooltip: { enabled: false } }
+        plugins: { legend: { position: 'bottom' }, datalabels: { display: false }, tooltip: { enabled: true, mode: 'index', intersect: false } }
     });
     updateKMGroupTooltip(parseInt(document.getElementById('km-time-slider-groups').value));
 }
@@ -425,24 +451,23 @@ function performLogRankTest() {
         }
     }
     const chi2 = variance_sum > 0 ? Math.pow(O_minus_E_sum, 2) / variance_sum : 0;
-    const p_value = Math.exp(-0.5 * chi2);
-    return { chi2, p_value, O_traite: O_traite_total, E_traite: E_traite_total, O_placebo: O_placebo_total, E_placebo: E_placebo_total };
+    const p_value = Math.exp(-0.5 * chi2); // Approximation for Chi2 distribution with 1 df
+    return { chi2, p_value, O_minus_E_sum, variance_sum, O_traite: O_traite_total, E_traite: E_traite_total, O_placebo: O_placebo_total, E_placebo: E_placebo_total };
 }
 
 function renderLogRankSection() {
-    const results = performLogRankTest();
     document.getElementById('log-rank-result').innerHTML = `
         <h3 class="text-lg font-bold">Résultat du Test Log-Rank</h3>
-        <p class="text-3xl font-mono mt-2">${results.p_value < 0.001 ? "p < 0.001" : `p ≈ ${results.p_value.toFixed(3)}`}</p>
-        <p>(Statistique de test = ${results.chi2.toFixed(2)})</p>
-        <p class="mt-2 ${results.p_value < 0.05 ? 'text-green-600' : 'text-red-600'}">${results.p_value < 0.05 ? 'Différence statistiquement significative.' : 'Pas de différence statistiquement significative.'}</p>
+        <p class="text-3xl font-mono mt-2">${logRankResults.p_value < 0.001 ? "p < 0.001" : `p ≈ ${logRankResults.p_value.toFixed(3)}`}</p>
+        <p class="text-xs">(Statistique du Chi² = ${logRankResults.chi2.toFixed(2)})</p>
+        <p class="mt-2 ${logRankResults.p_value < 0.05 ? 'text-green-600' : 'text-red-600'}">${logRankResults.p_value < 0.05 ? 'Différence statistiquement significative.' : 'Pas de différence statistiquement significative.'}</p>
     `;
     document.getElementById('log-rank-table').innerHTML = `
         <table class="w-full text-center">
-            <thead class="bg-slate-200"><tr><th>Groupe</th><th class="p-2">Observé</th><th class="p-2">Attendu</th></tr></thead>
+            <thead class="bg-slate-200"><tr><th>Groupe</th><th class="p-2">Observé (O)</th><th class="p-2">Attendu (E)</th></tr></thead>
             <tbody>
-                <tr class="border-b"><td class="p-2 font-bold text-cyan-700">Traité</td><td>${results.O_traite}</td><td>${results.E_traite.toFixed(1)}</td></tr>
-                <tr class="border-b"><td class="p-2 font-bold text-orange-500">Placebo</td><td>${results.O_placebo}</td><td>${results.E_placebo.toFixed(1)}</td></tr>
+                <tr class="border-b"><td class="p-2 font-bold text-cyan-700">Traité</td><td>${logRankResults.O_traite}</td><td>${logRankResults.E_traite.toFixed(1)}</td></tr>
+                <tr class="border-b"><td class="p-2 font-bold text-orange-500">Placebo</td><td>${logRankResults.O_placebo}</td><td>${logRankResults.E_placebo.toFixed(1)}</td></tr>
             </tbody>
         </table>`;
     const createChartPoints = (kmData, valueKey) => {
@@ -460,6 +485,47 @@ function renderLogRankSection() {
         scales: { x: { type: 'linear', min: 0, max: STUDY_END_TIME, title: { display: true, text: 'Temps (mois)' } }, y: { min: 0, max: 100, title: { display: true, text: 'Probabilité de survie (%)' }, ticks: {callback: (v) => v + '%'} } },
         plugins: { legend: { position: 'bottom' }, datalabels: { display: false }, tooltip: { enabled: true } }
     });
+}
+
+function performCoxModel() {
+    const { O_minus_E_sum, variance_sum } = logRankResults;
+    if (variance_sum <= 0) {
+        return { hr: NaN, ci_low: NaN, ci_high: NaN, p_value: NaN };
+    }
+    // Approximation du coefficient beta et du HR à partir des résultats du Log-Rank.
+    // C'est une approche valide et pédagogique pour une seule variable de groupe.
+    const beta = O_minus_E_sum / variance_sum; 
+    const hr = Math.exp(beta);
+    const se_beta = Math.sqrt(1 / variance_sum);
+    const ci_low = Math.exp(beta - 1.96 * se_beta);
+    const ci_high = Math.exp(beta + 1.96 * se_beta);
+   
+    // Pour une seule variable binaire, la p-value du test de Wald (Cox) est
+    // asymptotiquement équivalente à la p-value du test du Log-Rank.
+    const p_value = logRankResults.p_value; 
+
+    return { hr, ci_low, ci_high, p_value };
+}
+
+function renderCoxModelSection() {
+    const coxResults = performCoxModel();
+    const logRank_p = logRankResults.p_value;
+
+    document.getElementById('cox-model-result').innerHTML = `
+        <h3 class="text-lg font-bold">Résultat du Modèle de Cox</h3>
+        <div class="mt-4">
+            <p class="text-xl">Hazard Ratio (HR)</p>
+            <p class="text-4xl font-mono font-bold mt-1 ${coxResults.hr < 1 ? 'text-green-600' : 'text-red-600'}">${isFinite(coxResults.hr) ? coxResults.hr.toFixed(2) : 'N/A'}</p>
+        </div>
+        <div class="mt-4 text-slate-700">
+            <p>IC 95% : <span class="font-mono">[${isFinite(coxResults.ci_low) ? coxResults.ci_low.toFixed(2) : 'N/A'} ; ${isFinite(coxResults.ci_high) ? coxResults.ci_high.toFixed(2) : 'N/A'}]</span></p>
+            <p class="mt-1">p-value : <span class="font-mono">${isFinite(coxResults.p_value) ? (coxResults.p_value < 0.001 ? "p < 0.001" : `p ≈ ${coxResults.p_value.toFixed(3)}`) : 'N/A'}</span></p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-rose-200">
+            <h4 class="font-semibold">Comparaison avec le Log-Rank</h4>
+            <p class="text-sm mt-1">La p-value du modèle de Cox est très similaire à celle du test du Log-Rank (p ≈ ${logRank_p.toFixed(3)}). C'est normal : pour une seule variable de groupe, les deux tests évaluent la même hypothèse. Le modèle de Cox nous donne en plus une estimation de la <b>force de l'association</b> (le HR).</p>
+        </div>
+    `;
 }
 
 // ===================================================================================
@@ -485,14 +551,11 @@ function showNext(sectionId) {
             if (sectionId === 'kaplan-meier-section') renderKMSingleChart(); 
             if (sectionId === 'km-group-comparison-section') renderKMGroupChart();
             if (sectionId === 'log-rank-comparison') renderLogRankSection();
+            if (sectionId === 'cox-model-section') renderCoxModelSection();
             section.setAttribute('data-simulated', 'true');
         }
         setTimeout(() => { section.classList.add('visible-section'); section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
     }
-}
-function switchToGroupComparison() {
-    document.getElementById('kaplan-meier-section').style.display = 'none'; // Hide single view section
-    showNext('km-group-comparison-section');
 }
 </script>
 </body>
