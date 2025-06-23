@@ -113,18 +113,18 @@
 
         <section id="cox-model-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
             <h2 class="text-2xl font-bold text-rose-700 border-b-2 border-rose-100 pb-2">5. Quantification de l'Effet : le Modèle de Cox</h2>
-            <p class="mt-4 text-slate-600">Le test du Log-Rank nous dit s'il existe une différence significative, mais il ne quantifie pas l'<b>ampleur de l'effet</b> du traitement. Pour cela, on utilise le <b>modèle de régression de Cox</b>. Ce modèle estime le <b>Hazard Ratio (HR)</b>, qui représente le rapport des risques instantanés d'événement entre les deux groupes.
+            <p class="mt-4 text-slate-600">Le test du Log-Rank nous dit s'il existe une différence significative entre les courbes de survie, mais il ne quantifie pas l'<b>ampleur de l'effet</b> du traitement ou du facteur de risque. Pour cela, on utilise le <b>modèle de régression de Cox</b>. Ce modèle estime le <b>Hazard Ratio (HR)</b>, qui représente le rapport des risques instantanés d'événement entre les deux groupes.
             <br>
-            - Un <b>HR &lt; 1</b> indique que le traitement réduit le risque (effet protecteur).
+            - Un <b>HR &lt; 1</b> indique que le traitement/facteur de risque réduit le risque d'événement.
             <br>
-            - Un <b>HR > 1</b> indique que le traitement augmente le risque.
+            - Un <b>HR > 1</b> indique que le traitement/facteur de risque augmente le risque d'événement.
             <br>
             - Un <b>HR = 1</b> indique une absence d'effet.
             </p>
             <div id="cox-model-result" class="mt-6 p-6 bg-rose-50 border border-rose-200 rounded-lg text-center"></div>
             <div class="mt-6 p-4 bg-slate-100 rounded-md text-slate-700">
                 <h3 class="font-bold text-lg">Au-delà de la comparaison de deux groupes</h3>
-                <p class="mt-2">Le modèle de Cox est plus flexible que le Log-Rank :</p>
+                <p class="mt-2">Par rapport à un test du Log rank, le modèle de Cox a plusieurs avantages:</p>
                 <ul class="list-disc list-inside mt-2 space-y-1">
                     <li>Il peut analyser l'effet d'une <b>variable continue</b> (ex: l'âge, une valeur biologique) sur la survie, ce qui est impossible avec le Log-Rank qui ne compare que des groupes.</li>
                     <li>Il permet des <b>analyses multivariées</b> pour ajuster l'effet du traitement sur d'autres facteurs de confusion (ex: âge, sexe, comorbidités) et ainsi isoler l'effet propre du traitement.</li>
