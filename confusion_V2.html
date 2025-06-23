@@ -114,42 +114,15 @@
             <h2 class="text-2xl font-bold text-green-700 border-b-2 border-green-100 pb-2">2. Correction du Biais de Confusion</h2>
             <p class="mt-4 text-slate-600">Pour corriger un biais de confusion, le principe est toujours le même : il faut **comparer le risque de l'outcome (Y) en fonction de l'exposition (X) à des niveaux similaires du facteur de confusion (Z)**. Il existe plusieurs méthodes pour y parvenir.</p>
             <div class="mt-8 text-right">
-                <button onclick="showNext('randomization-part')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Voir la 1ère méthode : Randomisation →</button>
+                <button onclick="showNext('stratified-analysis-section')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Voir une méthode : Stratification →</button>
             </div>
-        </section>
-        
-        <section id="randomization-part" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
-             <h3 class="text-xl font-bold text-green-800">Méthode 1 : La Randomisation (le "Gold Standard")</h3>
-            <p class="mt-2 text-sm text-slate-600">La randomisation est la méthode la plus puissante. En assignant l'exposition (X) au hasard, elle brise artificiellement le lien entre le facteur de confusion (Z) et X. Le facteur Z n'est alors plus associé à X, et ne peut donc plus créer de confusion.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-4">
-                <div class="flex flex-col items-center p-4">
-                     <svg width="220" height="130" viewBox="0 0 220 130">
-                        <defs><marker id="arrowhead-rand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"></path></marker></defs>
-                        <text x="30" y="25" font-family="Roboto Slab, serif" font-size="24" text-anchor="middle">Z</text>
-                        <text x="95" y="115" font-family="Roboto Slab, serif" font-size="24" text-anchor="middle">X</text>
-                        <text x="190" y="115" font-family="Roboto Slab, serif" font-size="24" text-anchor="middle">Y</text>
-                        <text x="40" y="75" font-family="Roboto Slab, serif" font-size="24" fill="#16a34a" text-anchor="middle">R</text>
-                        <path d="M 55 80 L 85 100" stroke="#16a34a" stroke-width="4" fill="none" marker-end="url(#arrowhead-rand)"></path>
-                        <path d="M 45 35 Q 70 65, 85 95" stroke="#cbd5e1" stroke-width="2" fill="none" stroke-dasharray="5, 5"></path>
-                        <line x1="60" y1="50" x2="80" y2="75" stroke="red" stroke-width="4"></line><line x1="80" y1="50" x2="60" y2="75" stroke="red" stroke-width="4"></line>
-                        <path id="arrow-zy-rand" d="M 50 30 Q 120 45, 180 95" stroke-width="3" fill="none"></path>
-                        <line id="arrow-xy-rand" x1="115" y1="105" x2="170" y2="105" stroke-width="3" ></line>
-                    </svg>
-                    <p class="text-xs text-center mt-2">R: Randomisation</p>
-                </div>
-                 <div id="randomized-analysis-results" class="bg-green-50 p-4 rounded-lg border border-green-200 text-center"></div>
-            </div>
-            <div id="randomized-charts-container" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            <p id="randomization-note" class="text-sm text-slate-600 mt-4 italic"></p>
-             <div class="mt-8 text-right"><button onclick="showNext('stratified-analysis-section')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Voir la méthode suivante →</button></div>
         </section>
 
         <section id="stratified-analysis-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
-            <h3 class="text-xl font-bold text-green-800">Méthode 2 : L'Analyse Stratifiée</h3>
-            <p class="mt-2 text-sm text-slate-600">Si on ne peut pas randomiser, on peut corriger le biais lors de l'analyse. La stratification consiste à séparer la population en "strates" basées sur le facteur de confusion (ex: un groupe de fumeurs, un groupe de non-fumeurs). On analyse ensuite la relation X-Y à l'intérieur de chaque strate, où Z ne peut plus créer de confusion.</p>
+            <h3 class="text-xl font-bold text-green-800">Correction par Analyse Stratifiée</h3>
+            <p class="mt-2 text-sm text-slate-600">Si on ne peut pas randomiser, on peut corriger le biais lors de l'analyse. La stratification consiste à séparer la population en "strates" basées sur le facteur de confusion (ex: un groupe de fumeurs, un groupe de non-fumeurs). On analyse ensuite la relation X-Y à l'intérieur de chaque strate, où Z ne peut plus créer de confusion. C'est le principe des analyses en sous-groupes, mais ici on combine les résultats pour avoir une estimation globale de l'effet.</p>
             <div id="stratified-results-container" class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
             <div id="adjusted-or-container" class="mt-6 p-4 bg-green-50 rounded-lg border border-green-200 text-center"></div>
-            <div class="mt-8 text-right"><button class="px-5 py-2 bg-slate-400 text-white font-semibold rounded-md cursor-not-allowed">Prochaines méthodes à venir...</button></div>
         </section>
     </main>
 <script>
@@ -168,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
         no_zy: { x: "Alcool", y: "AVC", z: "Distance Domicile-Bar", zx: 2, zy: 1, xy: 2 },
         no_zx: { x: "Amiante", y: "Cancer", z: "Tabac", zx: 1, zy: 4, xy: 4 }
     };
-
     const chartInstances = {};
     function createOrUpdateChart(canvasId, type, data, options) {
         const ctx = document.getElementById(canvasId)?.getContext('2d');
@@ -179,30 +151,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function invLogit(logodds) { return 1 / (1 + Math.exp(-logodds)); }
 
-    function generateData(isRandomized = false) {
-        const or_zx_val = isRandomized ? 1.0 : parseFloat(document.getElementById('select-zx').value);
-        const or_zy_val = parseFloat(document.getElementById('select-zy').value);
-        const or_xy_val = parseFloat(document.getElementById('select-xy').value);
-        const logOR_zx = Math.log(or_zx_val);
-        const logOR_zy = Math.log(or_zy_val);
-        const logOR_xy = Math.log(or_xy_val);
+    function generateData() {
+        const or_zx = parseFloat(document.getElementById('select-zx').value);
+        const or_zy = parseFloat(document.getElementById('select-zy').value);
+        const or_xy = parseFloat(document.getElementById('select-xy').value);
+        const logOR_zx = Math.log(or_zx);
+        const logOR_zy = Math.log(or_zy);
+        const logOR_xy = Math.log(or_xy);
         const baseline_z_prob = 0.3; 
         const baseline_x_logodds = -1.5;
         const baseline_y_logodds = -2.5;
-        let data = [];
+        simData = [];
         for (let i = 0; i < N_SIM; i++) {
             const z = Math.random() < baseline_z_prob ? 1 : 0;
             const x_prob = invLogit(baseline_x_logodds + z * logOR_zx);
-            const x = isRandomized ? (Math.random() < 0.5 ? 1 : 0) : (Math.random() < x_prob ? 1 : 0);
+            const x = Math.random() < x_prob ? 1 : 0;
             const y_prob = invLogit(baseline_y_logodds + x * logOR_xy + z * logOR_zy);
             const y = Math.random() < y_prob ? 1 : 0;
-            data.push({ x, y, z, id: i });
+            simData.push({ x, y, z, id: i });
         }
-        return data;
     }
 
     window.runCrudeAnalysis = function() {
-        simData = generateData(false);
+        generateData();
         const a = simData.filter(p => p.x === 1 && p.y === 1).length;
         const b = simData.filter(p => p.x === 1 && p.y === 0).length;
         const c = simData.filter(p => p.x === 0 && p.y === 1).length;
@@ -212,14 +183,15 @@ document.addEventListener('DOMContentLoaded', () => {
         renderConfounderDistributionText();
         document.getElementById('results-section').classList.remove('hidden-section');
         document.getElementById('next-step-button-container').classList.remove('hidden-section');
+        document.getElementById('correction-methods-section').classList.add('hidden-section');
+        document.getElementById('stratified-analysis-section').classList.add('hidden-section');
     }
 
-    function renderContingencyTable(a, b, c, d) {
+    function renderContingencyTable(a, b, c, d, title = "Tableau de Contingence") {
         const varXName = document.getElementById('var-x').value;
         const varYName = document.getElementById('var-y').value;
-        const tableContainer = document.getElementById('crude-table-container');
-        tableContainer.innerHTML = `
-            <h4 class="font-semibold text-center mb-2">Tableau de Contingence</h4>
+        const tableHTML = `
+            <h4 class="font-semibold text-center mb-2">${title}</h4>
             <table class="w-full text-center border-collapse">
                 <thead><tr class="bg-slate-200"><th class="p-2 border"></th><th class="p-2 border">${varYName} (+)</th><th class="p-2 border">${varYName} (-)</th></tr></thead>
                 <tbody>
@@ -227,6 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <tr><th class="p-2 border bg-slate-100">${varXName} (-)</th><td class="p-2 border font-mono">${c}</td><td class="p-2 border font-mono">${d}</td></tr>
                 </tbody>
             </table>`;
+        if (title === "Tableau de Contingence") {
+            document.getElementById('crude-table-container').innerHTML = tableHTML;
+        }
+        return tableHTML;
     }
 
     function renderCrudeResults(a, b, c, d) {
@@ -359,6 +335,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // ===================================================================================
+    // LOGIQUE POUR LA PARTIE 2 (Correction)
+    // ===================================================================================
+    function runStratifiedAnalysis() {
+        const varZName = document.getElementById('var-z').value;
+        const container = document.getElementById('stratified-results-container');
+        container.innerHTML = '';
+        
+        let sum_ad_div_T = 0;
+        let sum_bc_div_T = 0;
+
+        ['0', '1'].forEach(z_level => {
+            const stratumData = simData.filter(p => p.z == z_level);
+            const a = stratumData.filter(p => p.x === 1 && p.y === 1).length;
+            const b = stratumData.filter(p => p.x === 1 && p.y === 0).length;
+            const c = stratumData.filter(p => p.x === 0 && p.y === 1).length;
+            const d = stratumData.filter(p => p.x === 0 && p.y === 0).length;
+            
+            const T = a+b+c+d;
+            if(T > 0 && b > 0 && c > 0) {
+                 sum_ad_div_T += (a*d)/T;
+                 sum_bc_div_T += (b*c)/T;
+            }
+
+            let or_stratum_html = "OR non calculable";
+            if (a > 0 && b > 0 && c > 0 && d > 0) {
+                const or_stratum = (a*d)/(b*c);
+                or_stratum_html = `OR = <b>${or_stratum.toFixed(2)}</b>`;
+            }
+
+            const stratumDiv = document.createElement('div');
+            stratumDiv.className = 'p-4 bg-slate-50 rounded-lg';
+            stratumDiv.innerHTML = `
+                ${renderContingencyTable(a,b,c,d, `Analyse dans la strate "${varZName} (${z_level == '1' ? '+' : '-'})"`)}
+                <p class="text-center mt-2">${or_stratum_html}</p>
+            `;
+            container.appendChild(stratumDiv);
+        });
+        
+        const or_adjusted = sum_bc_div_T > 0 ? sum_ad_div_T / sum_bc_div_T : NaN;
+        document.getElementById('adjusted-or-container').innerHTML = `
+             <h4 class="font-semibold mb-2">Résultat Combiné</h4>
+             <div class="text-lg">Moyenne pondérée des OR (Mantel-Haenszel) : <b class="font-mono">${isFinite(or_adjusted) ? or_adjusted.toFixed(2) : "N/A"}</b></div>
+             <p class="mt-4 text-sm text-green-700 italic">En combinant les estimations de chaque strate, on obtient un OR ajusté qui est une meilleure estimation de l'effet réel, car il est corrigé du biais de confusion.</p>
+        `;
+    }
+
+    // ===================================================================================
     // GESTION DES ÉVÉNEMENTS UI
     // ===================================================================================
     function updateUIFromScenario() {
@@ -367,7 +390,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ['var-x', 'var-y', 'var-z'].forEach(id => document.getElementById(id).readOnly = !isCustom);
         ['select-zx', 'select-zy', 'select-xy'].forEach(id => document.getElementById(id).disabled = !isCustom);
 
-        if(isCustom) return;
+        if(isCustom) {
+            updateVariableNamesInUI();
+            return;
+        };
 
         const scenario = SCENARIOS[selection];
         document.getElementById('var-x').value = scenario.x;
@@ -412,38 +438,6 @@ document.addEventListener('DOMContentLoaded', () => {
             arrow.style.stroke = color; arrow.style.strokeDasharray = ''; arrow.style.strokeWidth = (or > 2 || or < 0.5) ? '3' : '2'; arrow.style.markerEnd = marker;
         }
     }
-    
-    function runRandomizedAnalysis() {
-        const randomizedData = generateData(true);
-        const a = randomizedData.filter(p => p.x === 1 && p.y === 1).length;
-        const b = randomizedData.filter(p => p.x === 1 && p.y === 0).length;
-        const c = randomizedData.filter(p => p.x === 0 && p.y === 1).length;
-        const d = randomizedData.filter(p => p.x === 0 && p.y === 0).length;
-        
-        const or_random = (a * d) / (b * c);
-        const logOR = Math.log(or_random);
-        const seLogOR = Math.sqrt((1/a) + (1/b) + (1/c) + (1/d));
-        const ci_low = Math.exp(logOR - 1.96 * seLogOR);
-        const ci_high = Math.exp(logOR + 1.96 * seLogOR);
-
-        const or_real = parseFloat(document.getElementById('select-xy').value);
-
-        const container = document.getElementById('randomized-analysis-results');
-        container.innerHTML = `
-            <h4 class="font-semibold mb-2">Résultat de l'analyse randomisée</h4>
-            <div class="text-lg">OR Estimé : <b class="font-mono">${or_random.toFixed(2)}</b></div>
-            <div class="text-sm">IC 95% : [<span class="font-mono">${ci_low.toFixed(2)}</span> ; <span class="font-mono">${ci_high.toFixed(2)}</span>]</div>
-            <div class="text-sm">Vrai OR : <b class="font-mono">${or_real.toFixed(2)}</b></div>
-            <p class="mt-4 text-sm text-green-700 italic">Le biais de confusion a disparu ! L'OR estimé est maintenant très proche du vrai OR.</p>
-        `;
-        
-        const varXName = document.getElementById('var-x').value;
-        document.getElementById('randomization-note').textContent = `Note : En pratique, on ne peut pas toujours randomiser l'exposition (par exemple, on ne peut pas forcer des gens à fumer pour une étude sur le tabac). C'est pourquoi d'autres méthodes sont nécessaires.`;
-
-        // Update DAG in randomized view
-        updateArrowStyle(document.getElementById('arrow-zy-rand'), parseFloat(document.getElementById('select-zy').value));
-        updateArrowStyle(document.getElementById('arrow-xy-rand'), parseFloat(document.getElementById('select-xy').value), true);
-    }
 
     document.getElementById('scenario-select').addEventListener('change', updateUIFromScenario);
     ['var-x', 'var-y', 'var-z'].forEach(id => { document.getElementById(id).addEventListener('input', updateVariableNamesInUI); });
@@ -454,8 +448,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById(sectionId);
         if (section) {
             section.classList.remove('hidden-section');
-            if(sectionId === 'randomization-part') {
-                runRandomizedAnalysis();
+            if(sectionId === 'stratified-analysis-section') {
+                runStratifiedAnalysis();
             }
         }
     }
