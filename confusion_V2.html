@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprentissage de la Lecture Critique : Le Biais de Confusion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        h1, h2, h3, h4 { font-family: 'Roboto Slab', serif; }
+        .hidden-section { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-bold text-slate-900">Apprendre la Lecture Critique d'Article</h1>
+            <p class="mt-2 text-xl text-slate-600">Module Interactif sur le Biais de Confusion</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12">
+        <section id="confounding-simulation" class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold text-indigo-700 border-b-2 border-indigo-100 pb-2">1. Création d'un Biais de Confusion</h2>
+            <p class="mt-4 text-slate-600">Un facteur de confusion (Z) est une variable liée à la fois à l'exposition (X) et à l'outcome (Y), créant une association "fausse" ou "trompeuse" entre X et Y. <br><em class="text-sm">Note : Z n'a pas besoin d'être la cause directe de X ou Y ; une simple association (par exemple, via d'autres facteurs non mesurés) suffit pour créer une confusion.</em></p>
+            
+            <div class="mt-6 p-6 bg-slate-100 rounded-lg">
+                <h3 class="font-bold text-lg text-slate-800">Étape A : Choisir un scénario</h3>
+                <select id="scenario-select" class="mt-2 block w-full p-2 border border-slate-300 rounded-md">
+                    <option value="custom">-- Scénario Libre --</option>
+                    <option value="cafe" selected>Cas d'école : Café (X) - Tabac (Z) - Infarctus (Y)</option>
+                    <option value="lighter">Confusion classique : Avoir un briquet (X) - Tabac (Z) - Cancer (Y)</option>
+                    <option value="antidepressant">Confusion complexe : Antidépresseur (X) - ATCD Suicide (Z) - Hospitalisation (Y)</option>
+                    <option value="treatment">Confusion par indication : Traitement (X) - Sévérité (Z) - Guérison (Y)</option>
+                    <option value="no_zy">Absence de confusion (Z non lié à Y) : Alcool (X) - Distance Domicile-Bar (Z) - AVC (Y)</option>
+                    <option value="no_zx">Absence de confusion (Z non lié à X) : Amiante (X) - Tabac (Z) - Cancer (Y)</option>
+                </select>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div><label for="var-x" class="font-semibold">Exposition (X)</label><input type="text" id="var-x" class="mt-1 block w-full p-2 border border-slate-300 rounded-md"></div>
+                    <div><label for="var-y" class="font-semibold">Outcome (Y)</label><input type="text" id="var-y" class="mt-1 block w-full p-2 border border-slate-300 rounded-md"></div>
+                    <div><label for="var-z" class="font-semibold">Facteur de Confusion (Z)</label><input type="text" id="var-z" class="mt-1 block w-full p-2 border border-slate-300 rounded-md"></div>
+                </div>
+            </div>
+
+            <div class="mt-6 p-6 bg-slate-100 rounded-lg">
+                <h3 class="font-bold text-lg text-slate-800">Étape B : Définir les relations entre les variables</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                     <div class="space-y-6">
+                        <div>
+                            <label for="select-zx" class="font-semibold" id="label-q-zx">Lien Z → X</label>
+                            <select id="select-zx" class="mt-1 block w-full p-2 border border-slate-300 rounded-md">
+                                <option value="4">Augmente fortement (OR ≈ 4.0)</option><option value="2">Augmente faiblement (OR ≈ 2.0)</option><option value="1">Absence de lien (OR = 1.0)</option><option value="0.5">Diminue faiblement (OR ≈ 0.5)</option><option value="0.25">Diminue fortement (OR ≈ 0.25)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="select-zy" class="font-semibold" id="label-q-zy">Lien Z → Y</label>
+                            <select id="select-zy" class="mt-1 block w-full p-2 border border-slate-300 rounded-md">
+                               <option value="4">Augmente fortement (OR ≈ 4.0)</option><option value="2">Augmente faiblement (OR ≈ 2.0)</option><option value="1">Absence de lien (OR = 1.0)</option><option value="0.5">Diminue faiblement (OR ≈ 0.5)</option><option value="0.25">Diminue fortement (OR ≈ 0.25)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="select-xy" class="font-semibold" id="label-q-xy">Lien <b class="text-red-600">RÉEL</b> X → Y</label>
+                             <p class="text-xs text-slate-500">Fixez-le à "Absence de lien" pour simuler une situation où le lien observé n'est dû qu'à la confusion.</p>
+                            <select id="select-xy" class="mt-1 block w-full p-2 border border-slate-300 rounded-md">
+                                <option value="4">Augmente fortement (OR ≈ 4.0)</option><option value="2">Augmente faiblement (OR ≈ 2.0)</option><option value="1" selected>Absence de lien (OR = 1.0)</option><option value="0.5">Diminue faiblement (OR ≈ 0.5)</option><option value="0.25">Diminue fortement (OR ≈ 0.25)</option>
+                            </select>
+                        </div>
+                    </div>
+                     <div id="dag-container" class="flex justify-center items-center p-4">
+                        <svg width="220" height="130" viewBox="0 0 220 130">
+                            <defs>
+                                <marker id="arrowhead-strong-pos" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1d4ed8"></path></marker>
+                                <marker id="arrowhead-weak-pos" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa"></path></marker>
+                                <marker id="arrowhead-strong-neg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"></path></marker>
+                                <marker id="arrowhead-weak-neg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"></path></marker>
+                                <marker id="arrowhead-real" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"></path></marker>
+                            </defs>
+                            <text x="30" y="25" font-family="Roboto Slab, serif" font-size="24" text-anchor="middle">Z</text>
+                            <text x="95" y="115" font-family="Roboto Slab, serif" font-size="24" text-anchor="middle">X</text>
+                            <text x="190" y="115" font-family="Roboto Slab, serif" font-size="24" text-anchor="middle">Y</text>
+                            <path id="arrow-zx" d="M 45 35 Q 70 65, 85 95" stroke-width="3" fill="none"></path>
+                            <path id="arrow-zy" d="M 50 30 Q 120 45, 180 95" stroke-width="3" fill="none"></path>
+                            <line id="arrow-xy" x1="115" y1="105" x2="170" y2="105" stroke-width="3" ></line>
+                            <text x="142" y="95" font-size="20" fill="#dc2626" font-family="Roboto Slab, serif">?</text>
+                        </svg>
+                     </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center"><button onclick="runCrudeAnalysis()" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition text-lg">Générer les données et Lancer l'Analyse Naïve</button></div>
+            
+            <div id="results-section" class="mt-8 pt-6 border-t border-slate-200 hidden-section">
+                <h3 class="text-xl font-bold text-center">Résultats de l'Analyse Naïve (sans ajustement sur <span class="var-z-name">Tabac</span>)</h3>
+                <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <div id="crude-table-container"><h4 class="font-semibold text-center mb-2">Tableau de contingence</h4></div>
+                    <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200"><h4 class="font-semibold text-center mb-2">Calcul du Risque</h4><div id="crude-analysis-results" class="text-center"></div></div>
+                </div>
+                <div id="confounder-distribution-text" class="mt-8"></div>
+                <div id="bias-visualization-container" class="mt-8"></div>
+            </div>
+             <div class="mt-8 text-right hidden-section" id="next-step-button-container">
+                <button onclick="showNext('correction-methods-section')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Étape Suivante : Correction du Biais →</button>
+            </div>
+        </section>
+
+        <!-- PARTIE 2 : MÉTHODES DE CORRECTION -->
+        <section id="correction-methods-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
+            <h2 class="text-2xl font-bold text-green-700 border-b-2 border-green-100 pb-2">2. Correction du Biais de Confusion</h2>
+            <p class="mt-4 text-slate-600">Pour corriger un biais de confusion, le principe est toujours le même : il faut **comparer le risque de l'outcome (Y) en fonction de l'exposition (X) à des niveaux similaires du facteur de confusion (Z)**. Il existe plusieurs méthodes pour y parvenir.</p>
+            <div class="mt-8 text-right">
+                <button onclick="showNext('randomization-part')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Voir la 1ère méthode : Randomisation →</button>
+            </div>
+        </section>
+        
+        <section id="randomization-part" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
+             <h3 class="text-xl font-bold text-green-800">Méthode 1 : La Randomisation (le "Gold Standard")</h3>
+            <p class="mt-2 text-sm text-slate-600">La randomisation est la méthode la plus puissante. En assignant l'exposition (X) au hasard, elle brise artificiellement le lien entre le facteur de confusion (Z) et X. Le facteur Z n'est alors plus associé à X, et ne peut donc plus créer de confusion.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-4">
+                <div class="flex flex-col items-center p-4">
+                     <svg width="220" height="130" viewBox="0 0 220 130">
+                        <defs><marker id="arrowhead-rand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"></path></marker></defs>
+                        <text x="30" y="25" font-family="Roboto Slab, serif" font-size="24" text-anchor="middle">Z</text>
+                        <text x="95" y="115" font-family="Roboto Slab, serif" font-size="24" text-anchor="middle">X</text>
+                        <text x="190" y="115" font-family="Roboto Slab, serif" font-size="24" text-anchor="middle">Y</text>
+                        <text x="40" y="75" font-family="Roboto Slab, serif" font-size="24" fill="#16a34a" text-anchor="middle">R</text>
+                        <path d="M 55 80 L 85 100" stroke="#16a34a" stroke-width="4" fill="none" marker-end="url(#arrowhead-rand)"></path>
+                        <path d="M 45 35 Q 70 65, 85 95" stroke="#cbd5e1" stroke-width="2" fill="none" stroke-dasharray="5, 5"></path>
+                        <line x1="60" y1="50" x2="80" y2="75" stroke="red" stroke-width="4"></line><line x1="80" y1="50" x2="60" y2="75" stroke="red" stroke-width="4"></line>
+                        <path id="arrow-zy-rand" d="M 50 30 Q 120 45, 180 95" stroke-width="3" fill="none"></path>
+                        <line id="arrow-xy-rand" x1="115" y1="105" x2="170" y2="105" stroke-width="3" ></line>
+                    </svg>
+                    <p class="text-xs text-center mt-2">R: Randomisation</p>
+                </div>
+                 <div id="randomized-analysis-results" class="bg-green-50 p-4 rounded-lg border border-green-200 text-center"></div>
+            </div>
+            <div id="randomized-charts-container" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <p id="randomization-note" class="text-sm text-slate-600 mt-4 italic"></p>
+             <div class="mt-8 text-right"><button onclick="showNext('stratified-analysis-section')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Voir la méthode suivante →</button></div>
+        </section>
+
+        <section id="stratified-analysis-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
+            <h3 class="text-xl font-bold text-green-800">Méthode 2 : L'Analyse Stratifiée</h3>
+            <p class="mt-2 text-sm text-slate-600">Si on ne peut pas randomiser, on peut corriger le biais lors de l'analyse. La stratification consiste à séparer la population en "strates" basées sur le facteur de confusion (ex: un groupe de fumeurs, un groupe de non-fumeurs). On analyse ensuite la relation X-Y à l'intérieur de chaque strate, où Z ne peut plus créer de confusion.</p>
+            <div id="stratified-results-container" class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+            <div id="adjusted-or-container" class="mt-6 p-4 bg-green-50 rounded-lg border border-green-200 text-center"></div>
+            <div class="mt-8 text-right"><button class="px-5 py-2 bg-slate-400 text-white font-semibold rounded-md cursor-not-allowed">Prochaines méthodes à venir...</button></div>
+        </section>
+    </main>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // ===================================================================================
+    // SETUP & LOGIQUE DE SIMULATION
+    // ===================================================================================
+    Chart.register(ChartDataLabels);
+    let simData = [];
+    const N_SIM = 5000;
+    const SCENARIOS = {
+        cafe: { x: "Café", y: "Infarctus", z: "Tabac", zx: 4, zy: 4, xy: 1 },
+        antidepressant: { x: "Antidépresseur", y: "Hospitalisation", z: "ATCD Suicide", zx: 4, zy: 4, xy: 0.5 },
+        lighter: { x: "Avoir un briquet", y: "Cancer du poumon", z: "Tabac", zx: 2, zy: 4, xy: 1 },
+        treatment: { x: "Traitement X", y: "Guérison", z: "Sévérité Maladie", zx: 4, zy: 0.25, xy: 2 },
+        no_zy: { x: "Alcool", y: "AVC", z: "Distance Domicile-Bar", zx: 2, zy: 1, xy: 2 },
+        no_zx: { x: "Amiante", y: "Cancer", z: "Tabac", zx: 1, zy: 4, xy: 4 }
+    };
+
+    const chartInstances = {};
+    function createOrUpdateChart(canvasId, type, data, options) {
+        const ctx = document.getElementById(canvasId)?.getContext('2d');
+        if (!ctx) return;
+        if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
+        chartInstances[canvasId] = new Chart(ctx, { type, data, options });
+    }
+
+    function invLogit(logodds) { return 1 / (1 + Math.exp(-logodds)); }
+
+    function generateData(isRandomized = false) {
+        const or_zx_val = isRandomized ? 1.0 : parseFloat(document.getElementById('select-zx').value);
+        const or_zy_val = parseFloat(document.getElementById('select-zy').value);
+        const or_xy_val = parseFloat(document.getElementById('select-xy').value);
+        const logOR_zx = Math.log(or_zx_val);
+        const logOR_zy = Math.log(or_zy_val);
+        const logOR_xy = Math.log(or_xy_val);
+        const baseline_z_prob = 0.3; 
+        const baseline_x_logodds = -1.5;
+        const baseline_y_logodds = -2.5;
+        let data = [];
+        for (let i = 0; i < N_SIM; i++) {
+            const z = Math.random() < baseline_z_prob ? 1 : 0;
+            const x_prob = invLogit(baseline_x_logodds + z * logOR_zx);
+            const x = isRandomized ? (Math.random() < 0.5 ? 1 : 0) : (Math.random() < x_prob ? 1 : 0);
+            const y_prob = invLogit(baseline_y_logodds + x * logOR_xy + z * logOR_zy);
+            const y = Math.random() < y_prob ? 1 : 0;
+            data.push({ x, y, z, id: i });
+        }
+        return data;
+    }
+
+    window.runCrudeAnalysis = function() {
+        simData = generateData(false);
+        const a = simData.filter(p => p.x === 1 && p.y === 1).length;
+        const b = simData.filter(p => p.x === 1 && p.y === 0).length;
+        const c = simData.filter(p => p.x === 0 && p.y === 1).length;
+        const d = simData.filter(p => p.x === 0 && p.y === 0).length;
+        renderContingencyTable(a, b, c, d);
+        renderCrudeResults(a, b, c, d);
+        renderConfounderDistributionText();
+        document.getElementById('results-section').classList.remove('hidden-section');
+        document.getElementById('next-step-button-container').classList.remove('hidden-section');
+    }
+
+    function renderContingencyTable(a, b, c, d) {
+        const varXName = document.getElementById('var-x').value;
+        const varYName = document.getElementById('var-y').value;
+        const tableContainer = document.getElementById('crude-table-container');
+        tableContainer.innerHTML = `
+            <h4 class="font-semibold text-center mb-2">Tableau de Contingence</h4>
+            <table class="w-full text-center border-collapse">
+                <thead><tr class="bg-slate-200"><th class="p-2 border"></th><th class="p-2 border">${varYName} (+)</th><th class="p-2 border">${varYName} (-)</th></tr></thead>
+                <tbody>
+                    <tr><th class="p-2 border bg-slate-100">${varXName} (+)</th><td class="p-2 border font-mono">${a}</td><td class="p-2 border font-mono">${b}</td></tr>
+                    <tr><th class="p-2 border bg-slate-100">${varXName} (-)</th><td class="p-2 border font-mono">${c}</td><td class="p-2 border font-mono">${d}</td></tr>
+                </tbody>
+            </table>`;
+    }
+
+    function renderCrudeResults(a, b, c, d) {
+        const resultsContainer = document.getElementById('crude-analysis-results');
+        if (a === 0 || b === 0 || c === 0 || d === 0) {
+            resultsContainer.innerHTML = `<p class="text-red-600">Un des groupes est à 0, le calcul de l'OR est instable.</p>`; return;
+        }
+        const or_crude = (a * d) / (b * c);
+        const logOR = Math.log(or_crude);
+        const seLogOR = Math.sqrt((1/a) + (1/b) + (1/c) + (1/d));
+        const ci_low = Math.exp(logOR - 1.96 * seLogOR);
+        const ci_high = Math.exp(logOR + 1.96 * seLogOR);
+        const z_stat = logOR / seLogOR;
+        
+        function standardNormalCdf(x) {
+            let t = 1 / (1 + .2316419 * Math.abs(x));
+            let d_val = .3989423 * Math.exp(-x * x / 2);
+            let prob = d_val * t * (.3193815 + t * (-.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            return x > 0 ? 1 - prob : prob;
+        }
+        const p_value = 2 * (1 - standardNormalCdf(Math.abs(z_stat)));
+
+        const or_real = parseFloat(document.getElementById('select-xy').value);
+        const or_zx = parseFloat(document.getElementById('select-zx').value);
+        const or_zy = parseFloat(document.getElementById('select-zy').value);
+        
+        let conclusion = '';
+        if (or_zx == 1 || or_zy == 1) {
+            conclusion = `Comme au moins un des liens impliquant le facteur de confusion est absent, il ne peut pas y avoir de biais de confusion. L'OR brut de <b>${or_crude.toFixed(2)}</b> est une estimation correcte du véritable effet.`;
+        } else if (or_crude > or_real * 1.15) {
+            conclusion = `L'analyse naïve montre un OR de <b>${or_crude.toFixed(2)}</b>, qui est <b>sur-estimé</b> par rapport à l'effet réel (OR = ${or_real.toFixed(2)}). Le résultat est donc biaisé par le facteur de confusion.`;
+        } else if (or_crude < or_real * 0.85) {
+            conclusion = `L'analyse naïve montre un OR de <b>${or_crude.toFixed(2)}</b>, qui est <b>sous-estimé</b> par rapport à l'effet réel (OR = ${or_real.toFixed(2)}). Le résultat est donc biaisé par le facteur de confusion.`;
+        } else {
+            conclusion = `Dans ce scénario, le facteur de confusion a eu un impact limité, ou plusieurs effets se sont annulés. L'OR observé de <b>${or_crude.toFixed(2)}</b> est proche de l'OR réel.`;
+        }
+
+        resultsContainer.innerHTML = `
+            <div class="text-lg">Odds Ratio Brut : <span class="font-bold font-mono">${or_crude.toFixed(2)}</span></div>
+            <div class="text-sm">IC 95% : [<span class="font-mono">${ci_low.toFixed(2)}</span> ; <span class="font-mono">${ci_high.toFixed(2)}</span>]</div>
+            <div class="text-sm mt-2">p-value : <span class="font-mono">${p_value < 0.001 ? "< 0.001" : p_value.toFixed(3)}</span></div>
+            <hr class="my-4">
+            <p class="mt-2 text-sm text-indigo-700 italic">${conclusion}</p>
+            <p class="text-xs text-slate-500 mt-2">(Note : à chaque simulation, les données changent. Par hasard, un OR biaisé peut parfois se retrouver proche du vrai OR.)</p>`;
+        
+        renderBiasVisualization(or_crude, or_real);
+    }
+
+    function renderConfounderDistributionText() {
+        const xName = document.getElementById('var-x').value;
+        const yName = document.getElementById('var-y').value;
+        const zName = document.getElementById('var-z').value;
+
+        const groupX0 = simData.filter(p => p.x === 0);
+        const groupX1 = simData.filter(p => p.x === 1);
+        const groupZ0 = simData.filter(p => p.z === 0);
+        const groupZ1 = simData.filter(p => p.z === 1);
+
+        const z_in_x0_prop = groupX0.length > 0 ? (groupX0.filter(p => p.z === 1).length / groupX0.length * 100) : 0;
+        const z_in_x1_prop = groupX1.length > 0 ? (groupX1.filter(p => p.z === 1).length / groupX1.length * 100) : 0;
+        const y_in_z0_prop = groupZ0.length > 0 ? (groupZ0.filter(p => p.y === 1).length / groupZ0.length * 100) : 0;
+        const y_in_z1_prop = groupZ1.length > 0 ? (groupZ1.filter(p => p.y === 1).length / groupZ1.length * 100) : 0;
+
+        const container = document.getElementById('confounder-distribution-text');
+        container.innerHTML = `
+            <h3 class="text-xl font-bold text-center mb-4">Vérification des Conditions de Confusion</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="text-center p-4 bg-slate-50 rounded-lg">
+                    <h4 class="font-semibold">1. ${zName} est-il lié à ${xName} ?</h4>
+                    <p class="text-sm mt-2">Proportion de <b>${zName}(+)</b> chez les <b>${xName} (-)</b> : <b class="font-mono">${z_in_x0_prop.toFixed(1)}%</b></p>
+                    <p class="text-sm">Proportion de <b>${zName}(+)</b> chez les <b>${xName} (+)</b> : <b class="font-mono">${z_in_x1_prop.toFixed(1)}%</b></p>
+                </div>
+                <div class="text-center p-4 bg-slate-50 rounded-lg">
+                    <h4 class="font-semibold">2. ${zName} est-il lié à ${yName} ?</h4>
+                     <p class="text-sm mt-2">Risque de <b>${yName}</b> chez les <b>${zName} (-)</b> : <b class="font-mono">${y_in_z0_prop.toFixed(1)}%</b></p>
+                    <p class="text-sm">Risque de <b>${yName}</b> chez les <b>${zName} (+)</b> : <b class="font-mono">${y_in_z1_prop.toFixed(1)}%</b></p>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderBiasVisualization(or_crude, or_real) {
+        const container = document.getElementById('bias-visualization-container');
+        if (!container) return;
+
+        const minOR = 0.1, maxOR = 10;
+        const logMin = Math.log(minOR), logMax = Math.log(maxOR);
+
+        const toPercent = (val) => {
+            if (val <= minOR) return 0;
+            if (val >= maxOR) return 100;
+            return (Math.log(val) - logMin) / (logMax - logMin) * 100;
+        };
+
+        const pos_real = toPercent(or_real);
+        const pos_crude = toPercent(or_crude);
+        
+        const or_zx = parseFloat(document.getElementById('select-zx').value);
+        const or_zy = parseFloat(document.getElementById('select-zy').value);
+        const isBiasedTheoretically = or_zx !== 1 && or_zy !== 1;
+        const pointColor = isBiasedTheoretically ? '#ef4444' : '#22c55e'; // red / green
+
+        container.innerHTML = `
+            <h3 class="text-xl font-bold text-center">Biais-o-mètre : ampleur et direction du biais</h3>
+            <div class="relative w-full h-16 p-2 mt-6">
+                <div class="h-4 mt-6 bg-gradient-to-r from-amber-300 via-green-300 to-blue-300 rounded-lg"></div>
+                
+                <div class="absolute top-6 h-full border-l-2 border-black" style="left: ${pos_real}%;">
+                     <div class="absolute -top-6 text-xs font-bold text-center" style="transform: translateX(-50%); width: 80px;">
+                        Vrai OR
+                        <span class="block font-mono text-sm">${or_real.toFixed(2)}</span>
+                    </div>
+                </div>
+
+                <div class="absolute top-8 -translate-y-1/2" style="left: calc(${pos_crude}% - 10px);">
+                     <div class="absolute -top-6 text-xs font-bold text-center whitespace-nowrap" style="transform: translateX(-50%); left: 50%;">
+                        OR Estimé
+                    </div>
+                    <div class="w-5 h-5 rounded-full ring-2 ring-white" style="background-color: ${pointColor};"></div>
+                     <div class="absolute -bottom-7 text-xs font-bold text-center" style="transform: translateX(-50%); left: 50%;">
+                        <span class="block font-mono text-sm">${or_crude.toFixed(2)}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="relative w-full flex justify-between text-xs mt-1 px-2">
+                <span>← Sous-estimation</span>
+                <span>Sur-estimation →</span>
+            </div>
+        `;
+    }
+    
+    // ===================================================================================
+    // GESTION DES ÉVÉNEMENTS UI
+    // ===================================================================================
+    function updateUIFromScenario() {
+        const selection = document.getElementById('scenario-select').value;
+        const isCustom = selection === 'custom';
+        ['var-x', 'var-y', 'var-z'].forEach(id => document.getElementById(id).readOnly = !isCustom);
+        ['select-zx', 'select-zy', 'select-xy'].forEach(id => document.getElementById(id).disabled = !isCustom);
+
+        if(isCustom) return;
+
+        const scenario = SCENARIOS[selection];
+        document.getElementById('var-x').value = scenario.x;
+        document.getElementById('var-y').value = scenario.y;
+        document.getElementById('var-z').value = scenario.z;
+        document.getElementById('select-zx').value = scenario.zx;
+        document.getElementById('select-zy').value = scenario.zy;
+        document.getElementById('select-xy').value = scenario.xy;
+        updateVariableNamesInUI();
+    }
+
+    function updateVariableNamesInUI() {
+        const varXName = document.getElementById('var-x').value || "Exposition (X)";
+        const varYName = document.getElementById('var-y').value || "Outcome (Y)";
+        const varZName = document.getElementById('var-z').value || "Confusion (Z)";
+        
+        document.querySelectorAll('.var-z-name').forEach(el => el.textContent = varZName);
+        document.getElementById('label-q-zx').innerHTML = `Lien <span class="font-bold">${varZName}</span> → <span class="font-bold">${varXName}</span>`;
+        document.getElementById('label-q-zy').innerHTML = `Lien <span class="font-bold">${varZName}</span> → <span class="font-bold">${varYName}</span>`;
+        document.getElementById('label-q-xy').innerHTML = `Lien <b class="text-red-600">RÉEL</b> entre <span class="font-bold">${varXName}</span> et <span class="font-bold">${varYName}</span>`;
+        renderDAG();
+    }
+
+    function renderDAG() {
+        const arrows = { zx: document.getElementById('arrow-zx'), zy: document.getElementById('arrow-zy'), xy: document.getElementById('arrow-xy') };
+        ['zx', 'zy', 'xy'].forEach(id => updateArrowStyle(arrows[id], parseFloat(document.getElementById(`select-${id}`).value), id === 'xy'));
+    }
+    
+    function updateArrowStyle(arrow, or, isReal = false) {
+        if (!arrow) return;
+        if (or === 1) {
+            arrow.style.stroke = '#cbd5e1'; arrow.style.strokeDasharray = '5, 5'; arrow.style.strokeWidth = '2'; arrow.style.markerEnd = '';
+        } else {
+            let color, marker;
+            if (isReal) {
+                 color = '#dc2626'; marker = `url(#arrowhead-real)`;
+            } else if(or > 1) { 
+                color = or > 2 ? '#2563eb' : '#60a5fa'; marker = `url(#arrowhead-${or > 2 ? 'strong-pos' : 'weak-pos'})`; 
+            } else { 
+                color = or < 0.5 ? '#d97706' : '#fbbf24'; marker = `url(#arrowhead-${or < 0.5 ? 'strong-neg' : 'weak-neg'})`; 
+            }
+            arrow.style.stroke = color; arrow.style.strokeDasharray = ''; arrow.style.strokeWidth = (or > 2 || or < 0.5) ? '3' : '2'; arrow.style.markerEnd = marker;
+        }
+    }
+    
+    function runRandomizedAnalysis() {
+        const randomizedData = generateData(true);
+        const a = randomizedData.filter(p => p.x === 1 && p.y === 1).length;
+        const b = randomizedData.filter(p => p.x === 1 && p.y === 0).length;
+        const c = randomizedData.filter(p => p.x === 0 && p.y === 1).length;
+        const d = randomizedData.filter(p => p.x === 0 && p.y === 0).length;
+        
+        const or_random = (a * d) / (b * c);
+        const logOR = Math.log(or_random);
+        const seLogOR = Math.sqrt((1/a) + (1/b) + (1/c) + (1/d));
+        const ci_low = Math.exp(logOR - 1.96 * seLogOR);
+        const ci_high = Math.exp(logOR + 1.96 * seLogOR);
+
+        const or_real = parseFloat(document.getElementById('select-xy').value);
+
+        const container = document.getElementById('randomized-analysis-results');
+        container.innerHTML = `
+            <h4 class="font-semibold mb-2">Résultat de l'analyse randomisée</h4>
+            <div class="text-lg">OR Estimé : <b class="font-mono">${or_random.toFixed(2)}</b></div>
+            <div class="text-sm">IC 95% : [<span class="font-mono">${ci_low.toFixed(2)}</span> ; <span class="font-mono">${ci_high.toFixed(2)}</span>]</div>
+            <div class="text-sm">Vrai OR : <b class="font-mono">${or_real.toFixed(2)}</b></div>
+            <p class="mt-4 text-sm text-green-700 italic">Le biais de confusion a disparu ! L'OR estimé est maintenant très proche du vrai OR.</p>
+        `;
+        
+        const varXName = document.getElementById('var-x').value;
+        document.getElementById('randomization-note').textContent = `Note : En pratique, on ne peut pas toujours randomiser l'exposition (par exemple, on ne peut pas forcer des gens à fumer pour une étude sur le tabac). C'est pourquoi d'autres méthodes sont nécessaires.`;
+
+        // Update DAG in randomized view
+        updateArrowStyle(document.getElementById('arrow-zy-rand'), parseFloat(document.getElementById('select-zy').value));
+        updateArrowStyle(document.getElementById('arrow-xy-rand'), parseFloat(document.getElementById('select-xy').value), true);
+    }
+
+    document.getElementById('scenario-select').addEventListener('change', updateUIFromScenario);
+    ['var-x', 'var-y', 'var-z'].forEach(id => { document.getElementById(id).addEventListener('input', updateVariableNamesInUI); });
+    ['select-zx', 'select-zy', 'select-xy'].forEach(id => { document.getElementById(id).addEventListener('change', renderDAG); });
+    updateUIFromScenario();
+
+    window.showNext = function(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.classList.remove('hidden-section');
+            if(sectionId === 'randomization-part') {
+                runRandomizedAnalysis();
+            }
+        }
+    }
+});
+</script>
+</body>
+</html>
