@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprentissage : Fluctuation d'Échantillonnage & Test Statistique</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        h1, h2, h3, h4 { font-family: 'Roboto Slab', serif; }
+        .hidden-section { display: none; }
+        .control-radio:checked + label { background-color: #a78bfa; border-color: #7c3aed; color: white; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-bold text-slate-900">Fluctuations d’échantillonnage & Test statistique</h1>
+            <p class="mt-2 text-xl text-slate-600">Comprendre l'incertitude liée au hasard.</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12">
+
+        <!-- PARTIE 1: ÉCHANTILLONNAGE -->
+        <section id="sampling-section" class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold text-violet-700 border-b-2 border-violet-100 pb-2">1. Echantillonnage et mesure d'un paramètre</h2>
+            <p class="mt-4 text-slate-600">Pour conduire une étude, on ne peut pas analyser l'entièreté de la population source. On est obligé d’analyser un **échantillon** réduit. Lorsque l’on mesure un paramètre dans cet échantillon (âge moyen, proportion de femmes, etc.), celui-ci ne sera pas forcément égal au paramètre de la population source, et peut, par hasard, dévier de la "vraie" valeur. C'est la **fluctuation d'échantillonnage**.</p>
+            
+            <div class="mt-6 p-4 bg-slate-100 rounded-md">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="font-bold">1. Choisissez un paramètre à mesurer :</label>
+                        <select id="param-select" class="mt-2 block w-full p-2 border border-slate-300 rounded-md">
+                            <option value="mean_age">Âge moyen</option>
+                            <option value="prop_female">Proportion de femmes</option>
+                            <option value="rr_treatment">Effet d'un traitement (Risque Relatif)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sample-size" class="font-bold">2. Choisissez une taille d'échantillon :</label>
+                        <input type="number" id="sample-size" value="100" min="10" max="5000" class="mt-2 block w-full p-2 border border-slate-300 rounded-md">
+                    </div>
+                </div>
+                <div id="true-value-display" class="mt-4 text-center font-semibold"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 items-center mt-6 gap-4">
+                 <div id="sampling-animation-container" class="md:col-span-1 h-48 w-48 mx-auto relative bg-blue-100 border-2 border-blue-300 rounded">
+                     <div class="absolute text-xs text-blue-800 top-1 left-1">Population Source</div>
+                     <div id="sample-box" class="absolute w-1/5 h-1/5 bg-violet-500/50 border-2 border-violet-700 transition-all duration-500"></div>
+                 </div>
+                 <div class="md:col-span-2 text-center">
+                    <button id="run-single-sample-btn" class="px-6 py-2 bg-violet-600 text-white font-semibold rounded-md hover:bg-violet-700 transition">Tirer UN échantillon</button>
+                    <div id="single-sample-result" class="mt-4 h-10"></div>
+                 </div>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-slate-200">
+                <h3 class="font-semibold text-center">Distribution d'échantillonnage</h3>
+                <p class="text-center text-sm text-slate-500">Que se passe-t-il si on répète l'expérience un grand nombre de fois ?</p>
+                <div class="mt-4 text-center">
+                    <button id="run-many-samples-btn" class="px-6 py-2 bg-violet-800 text-white font-semibold rounded-md hover:bg-violet-900 transition">Tirer 10 000 échantillons</button>
+                </div>
+                <div class="mt-4"><canvas id="sampling-distribution-chart"></canvas></div>
+                <p class="mt-4 text-sm text-center italic text-slate-600"><b>Conclusion :</b> La valeur mesurée dans un échantillon fluctue autour de la vraie valeur. Avec un échantillon plus grand, ces fluctuations sont plus faibles et l'estimation est plus précise. Essayez de changer la taille de l'échantillon et de relancer la simulation !</p>
+            </div>
+             <div class="mt-8 text-right"><button id="next-to-ci-btn" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Étape Suivante : Intervalle de Confiance →</button></div>
+        </section>
+
+        <!-- PARTIE 2: INTERVALLE DE CONFIANCE -->
+        <section id="ci-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
+            <h2 class="text-2xl font-bold text-sky-700 border-b-2 border-sky-100 pb-2">2. Intervalle de Confiance à 95%</h2>
+            <p class="mt-4 text-slate-600">Puisqu'une seule mesure est imprécise, on l'accompagne d'un **intervalle de confiance (IC)**. C'est une plage de valeurs qui a une forte probabilité (généralement 95%) de contenir la vraie valeur du paramètre de la population source. Un IC large signifie une grande incertitude, un IC étroit une grande précision.</p>
+            
+            <div class="mt-6 p-4 bg-slate-100 rounded-md">
+                <p class="text-center">Utilisons les mêmes paramètres que précédemment. Tirez un nouvel échantillon pour calculer son IC à 95%.</p>
+                <div class="mt-4 text-center">
+                    <button id="run-single-ci-btn" class="px-6 py-2 bg-sky-600 text-white font-semibold rounded-md hover:bg-sky-700 transition">Tirer UN échantillon et calculer son IC95%</button>
+                </div>
+            </div>
+            <div id="single-ci-result" class="mt-4 h-28 relative"></div>
+            
+            <div class="mt-8 pt-6 border-t border-slate-200">
+                 <h3 class="font-semibold text-center">Que signifie "95% de chance" ?</h3>
+                 <p class="text-center text-sm text-slate-500">Si on répétait l'étude 100 fois, 95 des intervalles de confiance calculés contiendraient la vraie valeur.</p>
+                 <div class="mt-4 text-center">
+                     <button id="run-many-cis-btn" class="px-6 py-2 bg-sky-800 text-white font-semibold rounded-md hover:bg-sky-900 transition">Simuler 100 études</button>
+                 </div>
+                 <div class="mt-4 h-64"><canvas id="many-cis-canvas"></canvas></div>
+                 <div id="ci-coverage-summary" class="mt-4 text-center font-semibold"></div>
+            </div>
+             <div class="mt-8 text-right"><button id="next-to-pval-btn" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Étape Suivante : Test Statistique →</button></div>
+        </section>
+
+        <!-- PARTIE 3: TEST STATISTIQUE -->
+        <section id="pval-section" class="bg-white p-6 rounded-lg shadow-lg hidden-section">
+            <h2 class="text-2xl font-bold text-rose-700 border-b-2 border-rose-100 pb-2">3. Le Test Statistique</h2>
+            <p class="mt-4 text-slate-600">Lorsque l'on veut tester l'effet d'un traitement (X sur Y), on part de l'**hypothèse nulle (H0)** : "le traitement n'a aucun effet dans la population source". Le Risque Relatif (RR) réel est donc de 1.0. Cependant, à cause de la fluctuation d'échantillonnage, on peut observer un RR différent de 1 dans notre échantillon.<br>Le test statistique (et la p-value) répond à la question : "Si mon traitement n'a réellement aucun effet, quelle est la probabilité d'observer par pur hasard un effet au moins aussi important que celui que j'ai dans mon échantillon ?"</p>
+            
+            <div class="mt-6 p-4 bg-slate-100 rounded-md">
+                <p class="text-center">Nous allons simuler des études où le traitement n'a **aucun effet réel (RR=1.0)**.</p>
+                 <div class="text-center mt-4">
+                     <label for="h0-sample-size" class="font-bold">Taille d'échantillon par étude :</label>
+                     <input type="number" id="h0-sample-size" value="200" min="20" max="5000" class="p-2 w-24 border border-slate-300 rounded-md">
+                 </div>
+                 <div class="mt-4 text-center">
+                     <button id="run-h0-sample-btn" class="px-6 py-2 bg-rose-600 text-white font-semibold rounded-md hover:bg-rose-700 transition">Tirer UN échantillon sous H0</button>
+                 </div>
+            </div>
+
+            <div id="h0-distribution-container" class="mt-8 pt-6 border-t border-slate-200">
+                <div id="h0-sample-result" class="text-center mb-4"></div>
+                <canvas id="h0-distribution-chart"></canvas>
+                <div id="pval-explanation" class="mt-4 text-center"></div>
+            </div>
+        </section>
+    </main>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // ===================================================================================
+    // SETUP & LOGIQUE DE SIMULATION
+    // ===================================================================================
+    Chart.register(ChartDataLabels);
+    if (window.ChartAnnotation) {
+        Chart.register(window.ChartAnnotation);
+    }
+
+    const chartInstances = {};
+    const POPULATION_PARAMS = {
+        mean_age: { true_value: 65, sd: 15 },
+        prop_female: { true_value: 0.60 },
+        rr_treatment: { true_value: 1.5, base_risk: 0.2 }
+    };
+    let samplingDistributionData = [];
+    let h0Distribution = [];
+
+    function createOrUpdateChart(canvasId, type, data, options) {
+        const ctx = document.getElementById(canvasId)?.getContext('2d');
+        if (!ctx) return;
+        if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
+        chartInstances[canvasId] = new Chart(ctx, { type, data, options });
+    }
+    
+    // ===================================================================================
+    // PARTIE 1: Échantillonnage
+    // ===================================================================================
+    function getSelectedParam() { return document.getElementById('param-select').value; }
+    
+    function generateSample(size, type, isH0 = false) {
+        let sample = [];
+        if (type === 'mean_age') {
+            for (let i = 0; i < size; i++) {
+                let u1 = Math.random(), u2 = Math.random();
+                let z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                sample.push(z * POPULATION_PARAMS.mean_age.sd + POPULATION_PARAMS.mean_age.true_value);
+            }
+        } else if (type === 'prop_female') {
+            for (let i = 0; i < size; i++) {
+                sample.push(Math.random() < POPULATION_PARAMS.prop_female.true_value ? 1 : 0);
+            }
+        } else if (type === 'rr_treatment') {
+            const trueRR = isH0 ? 1.0 : POPULATION_PARAMS.rr_treatment.true_value;
+             for (let i = 0; i < size; i++) {
+                const group = Math.random() < 0.5 ? 'treated' : 'control';
+                const risk = group === 'treated' ? POPULATION_PARAMS.rr_treatment.base_risk * trueRR : POPULATION_PARAMS.rr_treatment.base_risk;
+                const outcome = Math.random() < risk ? 1 : 0;
+                sample.push({ group, outcome });
+            }
+        }
+        return sample;
+    }
+    
+    function calculateParameter(sample, type) {
+        if (!sample || sample.length === 0) return NaN;
+        if (type === 'mean_age') {
+            return sample.reduce((a, b) => a + b, 0) / sample.length;
+        } else if (type === 'prop_female') {
+            return sample.reduce((a, b) => a + b, 0) / sample.length;
+        } else if (type === 'rr_treatment') {
+            const treated = sample.filter(p => p.group === 'treated');
+            const control = sample.filter(p => p.group === 'control');
+            if(treated.length === 0 || control.length === 0) return NaN;
+            const risk_treated = treated.filter(p => p.outcome === 1).length / treated.length;
+            const risk_control = control.filter(p => p.outcome === 1).length / control.length;
+            if (risk_control === 0) return risk_treated > 0 ? Infinity : 1; // Avoid division by zero
+            return risk_treated / risk_control;
+        }
+        return NaN;
+    }
+
+    function animateSampleBox() {
+        const box = document.getElementById('sample-box');
+        const container = document.getElementById('sampling-animation-container');
+        const containerSize = container.offsetWidth;
+        const boxSize = box.offsetWidth;
+        const x = Math.random() * (containerSize - boxSize);
+        const y = Math.random() * (containerSize - boxSize);
+        box.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    function runSingleSample() {
+        animateSampleBox();
+        const type = getSelectedParam();
+        const size = parseInt(document.getElementById('sample-size').value);
+        const sample = generateSample(size, type);
+        const value = calculateParameter(sample, type);
+
+        const resultDiv = document.getElementById('single-sample-result');
+        if (isFinite(value)) {
+            resultDiv.innerHTML = `Valeur mesurée dans l'échantillon : <b class="text-2xl text-violet-700">${value.toFixed(2)}</b>`;
+        } else {
+            resultDiv.innerHTML = `<span class="text-red-500">Impossible de calculer le paramètre (données insuffisantes).</span>`;
+        }
+    }
+
+    function runManySamples() {
+        const type = getSelectedParam();
+        const size = parseInt(document.getElementById('sample-size').value);
+        samplingDistributionData = [];
+        for (let i = 0; i < 10000; i++) {
+            const sample = generateSample(size, type);
+            samplingDistributionData.push(calculateParameter(sample, type));
+        }
+        renderSamplingDistribution();
+    }
+    
+    function renderSamplingDistribution() {
+        const trueValue = POPULATION_PARAMS[getSelectedParam()].true_value;
+        const data = samplingDistributionData.filter(v => isFinite(v));
+        if (data.length === 0) return;
+        
+        const min = Math.min(...data), max = Math.max(...data);
+        const binCount = 40;
+        const binWidth = (max - min) / binCount;
+        const bins = new Array(binCount).fill(0);
+        const labels = new Array(binCount).fill(0).map((_, i) => (min + i * binWidth));
+        data.forEach(val => {
+            const binIndex = Math.floor((val - min) / binWidth);
+            bins[Math.min(binIndex, binCount - 1)]++;
+        });
+
+        let trueValueIndex = labels.findIndex(l => l >= trueValue);
+        if (trueValueIndex === -1) trueValueIndex = labels.length / 2;
+
+        createOrUpdateChart('sampling-distribution-chart', 'bar', 
+            { labels: labels.map(l => l.toFixed(2)), datasets: [{ label: "Distribution d'échantillonnage", data: bins, backgroundColor: 'rgba(139, 92, 246, 0.7)' }] },
+            { 
+                plugins: { legend: {display: false}, datalabels: {display: false},
+                    annotation: { annotations: { trueValueLine: { type: 'line', xMin: trueValueIndex, xMax: trueValueIndex, borderColor: 'red', borderWidth: 2, label: { content: 'Vraie Valeur', enabled: true, position: 'start'} } } }
+                }, 
+                scales: { x: { type: 'category' } } 
+            }
+        );
+    }
+    
+    function updateTrueValueDisplay() {
+        const type = getSelectedParam();
+        const trueValue = POPULATION_PARAMS[type].true_value;
+        document.getElementById('true-value-display').innerHTML = `Valeur dans la population source : <b class="text-violet-700">${trueValue.toFixed(2)}</b>`;
+    }
+
+    // ===================================================================================
+    // PARTIE 2: Intervalle de Confiance
+    // ===================================================================================
+    function runSingleCI() {
+        const type = getSelectedParam();
+        const size = parseInt(document.getElementById('sample-size').value);
+        const sample = generateSample(size, type);
+        const value = calculateParameter(sample, type);
+        const trueValue = POPULATION_PARAMS[type].true_value;
+        
+        let ci = [NaN, NaN];
+        if (isFinite(value)) {
+            if (type === 'mean_age') {
+                const mean = value;
+                const sd_sum = sample.reduce((sum, val) => sum + (val - mean)**2, 0);
+                const sd = Math.sqrt(sd_sum / (size - 1));
+                const se = sd / Math.sqrt(size);
+                ci = [mean - 1.96 * se, mean + 1.96 * se];
+            } else if (type === 'prop_female') {
+                const p = value;
+                const se = Math.sqrt(p * (1 - p) / size);
+                ci = [p - 1.96 * se, p + 1.96 * se];
+            } else if (type === 'rr_treatment') {
+                 const treated = sample.filter(p => p.group === 'treated');
+                 const control = sample.filter(p => p.group === 'control');
+                 const a = treated.filter(p=>p.outcome===1).length, b = treated.length - a;
+                 const c = control.filter(p=>p.outcome===1).length, d = control.length - c;
+                 if(a>0 && b>0 && c>0 && d>0) {
+                    const logRR = Math.log(value);
+                    const seLogRR = Math.sqrt((b/(a*(a+b))) + (d/(c*(c+d))));
+                    ci = [Math.exp(logRR - 1.96 * seLogRR), Math.exp(logRR + 1.96 * seLogRR)];
+                 }
+            }
+        }
+        
+        const containsTrueValue = trueValue >= ci[0] && trueValue <= ci[1];
+        const color = containsTrueValue ? 'bg-green-500' : 'bg-red-500';
+
+        document.getElementById('single-ci-result').innerHTML = `
+            <div class="text-center text-sm mb-2">Vraie valeur: <b class="font-mono">${trueValue.toFixed(2)}</b> | Estimation: <b class="font-mono">${isFinite(value) ? value.toFixed(2) : "N/A"}</b> | IC 95%: [<span class="font-mono">${isFinite(ci[0]) ? ci[0].toFixed(2) : "N/A"}</span> ; <span class="font-mono">${isFinite(ci[1]) ? ci[1].toFixed(2) : "N/A"}</span>]</div>
+            <div class="w-full h-8 relative border-b-2 border-slate-300">
+                <div class="absolute h-full border-l-2 border-black" style="left: ${toPercent(trueValue)}%;"><span class="absolute -top-4 text-xs font-bold" style="transform: translateX(-50%);">Vraie Valeur</span></div>
+                <div class="absolute h-1/2 top-1/4 ${color}" style="left: ${toPercent(ci[0])}%; right: ${100 - toPercent(ci[1])}%;"></div>
+                <div class="absolute top-1/2 w-3 h-3 bg-black rounded-full -translate-y-1/2" style="left: calc(${toPercent(value)}% - 6px);"></div>
+            </div>
+        `;
+    }
+
+    function toPercent(value) {
+        if (!isFinite(value)) return -100; // Off-screen
+        const type = getSelectedParam();
+        const trueValue = POPULATION_PARAMS[type].true_value;
+        const range = type === 'rr_treatment' ? 3 : 40;
+        const min = trueValue - range/2;
+        const max = trueValue + range/2;
+        return (value - min) / (max-min) * 100;
+    }
+
+    function runManyCIs() {
+        const canvas = document.getElementById('many-cis-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        
+        let successCount = 0;
+        const type = getSelectedParam();
+        const size = parseInt(document.getElementById('sample-size').value);
+        const trueValue = POPULATION_PARAMS[type].true_value;
+        const range = type === 'rr_treatment' ? 3 : 40;
+        const min = trueValue - range/2;
+        const max = trueValue + range/2;
+        
+        const trueValueX = (trueValue - min) / (max - min) * canvas.width;
+        ctx.strokeStyle = 'black'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(trueValueX, 0); ctx.lineTo(trueValueX, canvas.height); ctx.stroke();
+
+        for(let i=0; i<100; i++) {
+            const sample = generateSample(size, type);
+            const value = calculateParameter(sample, type);
+            let ci = [NaN, NaN];
+            if (isFinite(value)) {
+                if (type === 'mean_age') {
+                    const mean = value; const sd_sum = sample.reduce((sum, val) => sum + (val - mean)**2, 0); const sd = Math.sqrt(sd_sum / (size - 1));
+                    const se = sd / Math.sqrt(size); ci = [mean - 1.96 * se, mean + 1.96 * se];
+                } else if (type === 'prop_female') {
+                    const p = value; const se = Math.sqrt(p * (1 - p) / size); ci = [p - 1.96 * se, p + 1.96 * se];
+                } else if (type === 'rr_treatment') {
+                    const treated = sample.filter(p => p.group === 'treated'); const control = sample.filter(p => p.group === 'control');
+                    const a = treated.filter(p=>p.outcome===1).length, b = treated.length - a;
+                    const c = control.filter(p=>p.outcome===1).length, d = control.length - c;
+                    if(a>0 && b>0 && c>0 && d>0) {
+                        const logRR = Math.log(value); const seLogRR = Math.sqrt((b/(a*(a+b))) + (d/(c*(c+d))));
+                        ci = [Math.exp(logRR - 1.96 * seLogRR), Math.exp(logRR + 1.96 * seLogRR)];
+                    }
+                }
+            }
+            
+            const containsTrueValue = trueValue >= ci[0] && trueValue <= ci[1];
+            if(containsTrueValue) successCount++;
+            
+            const yPos = (i + 0.5) * (canvas.height / 100);
+            const x1 = (ci[0] - min) / (max - min) * canvas.width;
+            const x2 = (ci[1] - min) / (max - min) * canvas.width;
+            const xPoint = (value - min) / (max - min) * canvas.width;
+
+            ctx.strokeStyle = containsTrueValue ? 'rgba(34, 197, 94, 0.7)' : 'rgba(239, 68, 68, 0.7)';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(x1, yPos); ctx.lineTo(x2, yPos); ctx.stroke();
+
+            ctx.fillStyle = 'black';
+            ctx.beginPath(); ctx.arc(xPoint, yPos, 2, 0, 2*Math.PI); ctx.fill();
+        }
+        document.getElementById('ci-coverage-summary').textContent = `${successCount} sur 100 intervalles de confiance (soit ${successCount}%) contiennent la vraie valeur.`;
+    }
+
+    // ===================================================================================
+    // PARTIE 3: Test Statistique
+    // ===================================================================================
+     function runSingleH0Sample() {
+        const size = parseInt(document.getElementById('h0-sample-size').value);
+        document.getElementById('h0-sample-result').innerHTML = `On tire un échantillon de ${size} patients...<br>RR estimé: <b class="font-mono text-2xl text-rose-700">...</b>`;
+        
+        setTimeout(() => {
+            const sample = generateSample(size, 'rr_treatment', true);
+            const rr_h0 = calculateParameter(sample, 'rr_treatment');
+            if (!isFinite(rr_h0)) {
+                 document.getElementById('h0-sample-result').innerHTML = `<span class="text-red-500">Erreur de calcul, réessayez.</span>`;
+                 return;
+            }
+            document.getElementById('h0-sample-result').innerHTML = `On tire un échantillon de ${size} patients...<br>RR estimé: <b class="font-mono text-2xl text-rose-700">${rr_h0.toFixed(2)}</b>`;
+            
+            if (h0Distribution.length === 0) {
+                for (let i = 0; i < 5000; i++) {
+                    const s = generateSample(size, 'rr_treatment', true);
+                    h0Distribution.push(calculateParameter(s, 'rr_treatment'));
+                }
+            }
+            
+            const p_value = h0Distribution.filter(v => v >= rr_h0 || v <= (1/rr_h0)).length / h0Distribution.length;
+            document.getElementById('pval-explanation').innerHTML = `La probabilité d'observer un RR aussi extrême (ou plus) par pur hasard est de <b>${(p_value * 100).toFixed(1)}%</b>. C'est la <b>p-value</b>.`;
+            renderH0Distribution(rr_h0);
+        }, 200);
+    }
+
+    function renderH0Distribution(currentRR) {
+        const data = h0Distribution.filter(v => isFinite(v));
+        if (data.length === 0) return;
+        const meanLog = data.reduce((sum, v) => sum + Math.log(v), 0) / data.length;
+        const sdLog = Math.sqrt(data.reduce((sum,v) => sum + (Math.log(v) - meanLog)**2, 0) / data.length);
+        
+        const densityPoints = [];
+        for(let i=0.2; i<=3.5; i+=0.1) {
+            const pdf = (1/(i*sdLog*Math.sqrt(2*Math.PI))) * Math.exp(-((Math.log(i)-meanLog)**2)/(2*sdLog**2));
+            densityPoints.push({x: i, y: pdf});
+        }
+
+        const ci95 = [Math.exp(meanLog - 1.96*sdLog), Math.exp(meanLog + 1.96*sdLog)];
+
+        createOrUpdateChart('h0-distribution-chart', 'line', 
+            { datasets: [{ label: "Distribution théorique sous H0", data: densityPoints, borderColor: 'rgba(244, 63, 94, 0.7)', fill: true, tension: 0.4 }] },
+            { 
+                plugins: { 
+                    legend: {display: false}, datalabels: {display: false},
+                    annotation: { 
+                        annotations: { 
+                            ciLineLow: { type: 'line', xMin: ci95[0], xMax: ci95[0], borderColor: 'grey', borderWidth: 2, borderDash: [6,6], label: {content: '2.5%', enabled: true}},
+                            ciLineHigh: { type: 'line', xMin: ci95[1], xMax: ci95[1], borderColor: 'grey', borderWidth: 2, borderDash: [6,6], label: {content: '97.5%', enabled: true}},
+                            observedLine: { type: 'line', xValue: currentRR, scaleID: 'x', borderColor: 'blue', borderWidth: 3, label: { content: 'RR Observé', enabled: true, position: 'end', yAdjust: -15, backgroundColor: 'rgba(59, 130, 246, 0.7)'} }
+                        } 
+                    }
+                },
+                scales: {x: {type: 'linear', title: {display: true, text: "Valeur du Risque Relatif"}}}
+            }
+        );
+    }
+    
+    // ===================================================================================
+    // INITIALISATION ET GESTION DES ÉVÉNEMENTS
+    // ===================================================================================
+    document.getElementById('param-select').addEventListener('change', () => {
+        updateTrueValueDisplay();
+        document.getElementById('single-sample-result').innerHTML = '';
+        if(chartInstances['sampling-distribution-chart']) chartInstances['sampling-distribution-chart'].destroy();
+    });
+
+    document.getElementById('run-single-sample-btn').addEventListener('click', runSingleSample);
+    document.getElementById('run-many-samples-btn').addEventListener('click', runManySamples);
+    document.getElementById('next-to-ci-btn').addEventListener('click', () => showNext('ci-section'));
+    document.getElementById('run-single-ci-btn').addEventListener('click', runSingleCI);
+    document.getElementById('run-many-cis-btn').addEventListener('click', runManyCIs);
+    document.getElementById('next-to-pval-btn').addEventListener('click', () => showNext('pval-section'));
+    document.getElementById('run-h0-sample-btn').addEventListener('click', runSingleH0Sample);
+
+    function showNext(sectionId) {
+        document.getElementById(sectionId).classList.remove('hidden-section');
+    }
+
+    updateTrueValueDisplay();
+});
+</script>
+</body>
+</html>
