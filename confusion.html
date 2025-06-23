@@ -28,16 +28,18 @@
     <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12">
         <section id="confounding-simulation" class="bg-white p-6 rounded-lg shadow-lg">
             <h2 class="text-2xl font-bold text-indigo-700 border-b-2 border-indigo-100 pb-2">1. Création d'un Biais de Confusion</h2>
-            <p class="mt-4 text-slate-600">Un facteur de confusion (Z) est une variable liée à la fois à l'exposition (X) et à l'outcome (Y), créant une association "fausse" ou "trompeuse" entre X et Y. Cette simulation vous permet de construire ce scénario et d'observer les conséquences d'une analyse qui ignore le facteur de confusion.</p>
+            <p class="mt-4 text-slate-600">Un facteur de confusion (Z) est une variable liée à la fois à l'exposition (X) et à l'outcome (Y), créant une association "fausse" ou "trompeuse" entre X et Y. <br><em class="text-sm">Note : Z n'a pas besoin d'être la cause directe de X ou Y ; une simple association (par exemple, via d'autres facteurs non mesurés) suffit pour créer une confusion.</em></p>
             
             <div class="mt-6 p-6 bg-slate-100 rounded-lg">
                 <h3 class="font-bold text-lg text-slate-800">Étape A : Choisir un scénario</h3>
                 <select id="scenario-select" class="mt-2 block w-full p-2 border border-slate-300 rounded-md">
                     <option value="custom">-- Scénario Libre --</option>
-                    <option value="cafe" selected>Café (X) - Tabac (Z) - Infarctus (Y)</option>
-                    <option value="antidepressant">Antidépresseur (X) - ATCD Suicide (Z) - Hospitalisation (Y)</option>
-                    <option value="lighter">Avoir un briquet (X) - Tabac (Z) - Cancer du poumon (Y)</option>
-                    <option value="treatment">Traitement (X) - Sévérité maladie (Z) - Guérison (Y)</option>
+                    <option value="cafe" selected>Cas d'école : Café (X) - Tabac (Z) - Infarctus (Y)</option>
+                    <option value="lighter">Confusion classique : Avoir un briquet (X) - Tabac (Z) - Cancer (Y)</option>
+                    <option value="antidepressant">Confusion complexe : Antidépresseur (X) - ATCD Suicide (Z) - Hospitalisation (Y)</option>
+                    <option value="treatment">Confusion par indication : Traitement (X) - Sévérité (Z) - Guérison (Y)</option>
+                    <option value="no_zy">Absence de confusion (Z non lié à Y) : Alcool (X) - Distance Domicile-Bar (Z) - AVC (Y)</option>
+                    <option value="no_zx">Absence de confusion (Z non lié à X) : Amiante (X) - Tabac (Z) - Cancer (Y)</option>
                 </select>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                     <div><label for="var-x" class="font-semibold">Exposition (X)</label><input type="text" id="var-x" class="mt-1 block w-full p-2 border border-slate-300 rounded-md"></div>
@@ -100,6 +102,7 @@
                     <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200"><h4 class="font-semibold text-center mb-2">Calcul du Risque</h4><div id="crude-analysis-results" class="text-center"></div></div>
                 </div>
                 <div id="confounder-distribution-text" class="mt-8"></div>
+                <div id="bias-visualization-container" class="mt-8"></div>
             </div>
              <div class="mt-8 text-right hidden-section" id="next-step-button-container">
                 <button onclick="showNext('stratified-analysis-section')" class="px-5 py-2 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 transition">Étape Suivante : Correction du Biais →</button>
@@ -117,24 +120,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===================================================================================
     // SETUP & LOGIQUE DE SIMULATION
     // ===================================================================================
-    Chart.register(ChartDataLabels);
     let simData = [];
     const N_SIM = 5000;
     const SCENARIOS = {
         cafe: { x: "Café", y: "Infarctus", z: "Tabac", zx: 4, zy: 4, xy: 1 },
         antidepressant: { x: "Antidépresseur", y: "Hospitalisation", z: "ATCD Suicide", zx: 4, zy: 4, xy: 0.5 },
         lighter: { x: "Avoir un briquet", y: "Cancer du poumon", z: "Tabac", zx: 2, zy: 4, xy: 1 },
-        treatment: { x: "Traitement X", y: "Guérison", z: "Sévérité Maladie", zx: 4, zy: 0.25, xy: 2 }
+        treatment: { x: "Traitement X", y: "Guérison", z: "Sévérité Maladie", zx: 4, zy: 0.25, xy: 2 },
+        no_zy: { x: "Alcool", y: "AVC", z: "Distance Domicile-Bar", zx: 2, zy: 1, xy: 2 },
+        no_zx: { x: "Amiante", y: "Cancer", z: "Tabac", zx: 1, zy: 4, xy: 4 }
     };
-
-    const chartInstances = {};
-    function createOrUpdateChart(canvasId, type, data, options) {
-        const ctx = document.getElementById(canvasId).getContext('2d');
-        if (chartInstances[canvasId]) {
-            chartInstances[canvasId].destroy();
-        }
-        chartInstances[canvasId] = new Chart(ctx, { type, data, options });
-    }
 
     function invLogit(logodds) { return 1 / (1 + Math.exp(-logodds)); }
 
@@ -165,11 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const b = simData.filter(p => p.x === 1 && p.y === 0).length;
         const c = simData.filter(p => p.x === 0 && p.y === 1).length;
         const d = simData.filter(p => p.x === 0 && p.y === 0).length;
-
         renderContingencyTable(a, b, c, d);
         renderCrudeResults(a, b, c, d);
         renderConfounderDistributionText();
-
         document.getElementById('results-section').classList.remove('hidden-section');
         document.getElementById('next-step-button-container').classList.remove('hidden-section');
     }
@@ -202,21 +195,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const z_stat = logOR / seLogOR;
         
         function standardNormalCdf(x) {
-            return 0.5 * (1 + (x / Math.sqrt(2)) / (Math.abs(x / Math.sqrt(2)) || 1) * Math.sqrt(1 - Math.exp(-2 * x * x / Math.PI)));
+            let t = 1 / (1 + .2316419 * Math.abs(x));
+            let d_val = .3989423 * Math.exp(-x * x / 2);
+            let prob = d_val * t * (.3193815 + t * (-.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            return x > 0 ? 1 - prob : prob;
         }
         const p_value = 2 * (1 - standardNormalCdf(Math.abs(z_stat)));
 
-        const varXName = document.getElementById('var-x').value;
-        const varYName = document.getElementById('var-y').value;
         const or_real = parseFloat(document.getElementById('select-xy').value);
         const or_zx = parseFloat(document.getElementById('select-zx').value);
         const or_zy = parseFloat(document.getElementById('select-zy').value);
         
         let conclusion = '';
         if (or_zx == 1 || or_zy == 1) {
-            conclusion = `Comme l'un des liens impliquant le facteur de confusion est absent, il ne peut pas y avoir de biais de confusion. L'OR brut de <b>${or_crude.toFixed(2)}</b> est une estimation correcte du véritable effet.`;
-        } else if (Math.abs(or_crude - or_real) > 0.3) {
-            conclusion = `L'analyse naïve suggère faussement une association (OR=${or_crude.toFixed(2)}), car elle est biaisée par le facteur de confusion. L'effet réel est de <b>${or_real.toFixed(2)}</b>.`;
+            conclusion = `Comme au moins un des liens impliquant le facteur de confusion est absent, il ne peut pas y avoir de biais de confusion. L'OR brut de <b>${or_crude.toFixed(2)}</b> est une estimation correcte du véritable effet.`;
+        } else if (or_crude > or_real * 1.15) {
+            conclusion = `L'analyse naïve montre un OR de <b>${or_crude.toFixed(2)}</b>, qui est <b>sur-estimé</b> par rapport à l'effet réel (OR = ${or_real.toFixed(2)}). Le résultat est donc biaisé par le facteur de confusion.`;
+        } else if (or_crude < or_real * 0.85) {
+            conclusion = `L'analyse naïve montre un OR de <b>${or_crude.toFixed(2)}</b>, qui est <b>sous-estimé</b> par rapport à l'effet réel (OR = ${or_real.toFixed(2)}). Le résultat est donc biaisé par le facteur de confusion.`;
         } else {
             conclusion = `Dans ce scénario, le facteur de confusion a eu un impact limité, ou plusieurs effets se sont annulés. L'OR observé de <b>${or_crude.toFixed(2)}</b> est proche de l'OR réel.`;
         }
@@ -225,7 +221,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="text-lg">Odds Ratio Brut : <span class="font-bold font-mono">${or_crude.toFixed(2)}</span></div>
             <div class="text-sm">IC 95% : [<span class="font-mono">${ci_low.toFixed(2)}</span> ; <span class="font-mono">${ci_high.toFixed(2)}</span>]</div>
             <div class="text-sm mt-2">p-value : <span class="font-mono">${p_value < 0.001 ? "< 0.001" : p_value.toFixed(3)}</span></div>
-            <p class="mt-4 text-sm text-indigo-700 italic">${conclusion}</p>`;
+            <hr class="my-4">
+            <p class="mt-2 text-sm text-indigo-700 italic">${conclusion}</p>
+            <p class="text-xs text-slate-500 mt-2">(Note : à chaque simulation, les données changent. Par hasard, un OR biaisé peut parfois se retrouver proche du vrai OR.)</p>`;
+        
+        renderBiasVisualization(or_crude, or_real);
     }
 
     function renderConfounderDistributionText() {
@@ -258,15 +258,61 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="text-sm">Risque de <b>${yName}</b> chez les <b>${zName} (+)</b> : <b class="font-mono">${y_in_z1_prop.toFixed(1)}%</b></p>
                 </div>
             </div>
-            <p class="text-center text-sm text-slate-600 mt-4 italic">
-                ${Math.abs(z_in_x0_prop - z_in_x1_prop) > 5 && Math.abs(y_in_z0_prop - y_in_z1_prop) > 5 ? 
-                `Les deux conditions de la confusion sont remplies. Le lien brut X-Y est probablement biaisé.` :
-                `Au moins une des conditions de la confusion n'est pas remplie. Le lien brut X-Y ne devrait pas être biaisé.`
-                }
-            </p>
         `;
     }
 
+    function renderBiasVisualization(or_crude, or_real) {
+        const container = document.getElementById('bias-visualization-container');
+        if (!container) return;
+
+        const minOR = 0.1, maxOR = 10;
+        const logMin = Math.log(minOR), logMax = Math.log(maxOR);
+
+        const toPercent = (val) => {
+            if (val <= minOR) return 0;
+            if (val >= maxOR) return 100;
+            return (Math.log(val) - logMin) / (logMax - logMin) * 100;
+        };
+
+        const pos_real = toPercent(or_real);
+        const pos_crude = toPercent(or_crude);
+        
+        const or_zx = parseFloat(document.getElementById('select-zx').value);
+        const or_zy = parseFloat(document.getElementById('select-zy').value);
+        const isBiasedTheoretically = or_zx !== 1 && or_zy !== 1;
+        const pointColor = isBiasedTheoretically ? '#ef4444' : '#22c55e'; // red / green
+
+        container.innerHTML = `
+            <h3 class="text-xl font-bold text-center">Biais-o-mètre : ampleur et direction du biais</h3>
+            <div class="relative w-full h-16 p-2 mt-6">
+                <div class="h-4 mt-6 bg-gradient-to-r from-amber-300 via-green-300 to-blue-300 rounded-lg"></div>
+                
+                <!-- Vraie valeur -->
+                <div class="absolute top-6 h-full border-l-2 border-black" style="left: ${pos_real}%;">
+                     <div class="absolute -top-6 text-xs font-bold text-center" style="transform: translateX(-50%); width: 80px;">
+                        Vrai OR
+                        <span class="block font-mono text-sm">${or_real.toFixed(2)}</span>
+                    </div>
+                </div>
+
+                <!-- Valeur estimée -->
+                <div class="absolute top-8 -translate-y-1/2" style="left: calc(${pos_crude}% - 10px);">
+                     <div class="absolute -top-6 text-xs font-bold text-center whitespace-nowrap" style="transform: translateX(-50%); left: 50%;">
+                        OR Estimé
+                    </div>
+                    <div class="w-5 h-5 rounded-full ring-2 ring-white" style="background-color: ${pointColor};"></div>
+                     <div class="absolute -bottom-7 text-xs font-bold text-center" style="transform: translateX(-50%); left: 50%;">
+                        <span class="block font-mono text-sm">${or_crude.toFixed(2)}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="relative w-full flex justify-between text-xs mt-1 px-2">
+                <span>← Sous-estimation</span>
+                <span>Sur-estimation →</span>
+            </div>
+        `;
+    }
+    
     // ===================================================================================
     // GESTION DES ÉVÉNEMENTS UI
     // ===================================================================================
